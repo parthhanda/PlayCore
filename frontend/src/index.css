@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* RGB/Cyberpunk Theme Colors */
+  --color-background: rgb(5 5 5);
+  /* Darker black for contrast */
+  --color-surface: rgb(15 15 15);
+
+  --color-primary: rgb(0 255 255);
+  /* Cyan */
+  --color-secondary: rgb(255 0 255);
+  /* Magenta */
+  --color-accent: rgb(57 255 20);
+  /* Neon Green */
+
+  --color-neon-blue: rgb(0 243 255);
+  --color-neon-pink: rgb(255 0 255);
+  --color-neon-green: rgb(0 255 0);
+
+  /* Fonts - Global Orbitron */
+  --font-sans: 'Orbitron', sans-serif;
+  --font-display: 'Orbitron', sans-serif;
+}
+
+/* Custom Interactive Effects */
+.hover-glow-blue {
+  transition: all 0.3s ease;
+}
+
+.hover-glow-blue:hover {
+  box-shadow: 0 0 10px var(--color-neon-blue), 0 0 20px var(--color-neon-blue);
+}
+
+/* Base Styles */
+body {
+  background-color: var(--color-background);
+  color: white;
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
