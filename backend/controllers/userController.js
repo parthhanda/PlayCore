@@ -140,11 +140,6 @@ const acceptFriendRequest = async (req, res) => {
 
         await user.populate('friends', 'username avatar');
 
-        await user.save();
-        await friend.save();
-
-        await user.populate('friends', 'username avatar');
-
         res.json(user.friends);
     } catch (error) {
         console.error(error);
@@ -202,10 +197,29 @@ const removeFriend = async (req, res) => {
     }
 };
 
+// @desc    Get Friends List
+// @route   GET /api/users/friends/list
+// @access  Private
+const getFriendsList = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate('friends', 'username avatar gamertag status');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json(user.friends);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getUserProfile,
     updateUserProfile,
     getUsers,
+    getFriendsList,
     sendFriendRequest,
     acceptFriendRequest,
     declineFriendRequest,

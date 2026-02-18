@@ -7,13 +7,15 @@ const {
     sendFriendRequest,
     acceptFriendRequest,
     declineFriendRequest,
-    removeFriend
+    removeFriend,
+    getFriendsList
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.get('/', getUsers);
 router.get('/u/:username', getUserProfile);
 router.put('/profile', protect, updateUserProfile);
+router.get('/friends/list', protect, getFriendsList);
 
 router.put('/request/:id', protect, sendFriendRequest);
 router.put('/accept/:id', protect, acceptFriendRequest);

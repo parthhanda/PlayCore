@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+﻿import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import heroBg from '../assets/hero-bg.jpg';
@@ -40,6 +40,7 @@ const Home = () => {
 
     return (
         <div className="bg-background text-white min-h-screen font-sans selection:bg-primary selection:text-black overflow-x-hidden">
+
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
                 <div
@@ -67,11 +68,11 @@ const Home = () => {
                     <div className="flex flex-col md:flex-row gap-6 justify-center pt-8">
                         {user ? (
                             <Link
-                                to="/dashboard"
+                                to="/tournaments"
                                 className="group relative px-8 py-4 bg-primary text-black font-black text-lg tracking-[0.2em] clip-path-polygon hover:bg-white hover:shadow-[0_0_30px_rgba(0,255,255,0.6)] transition-all duration-300 uppercase flex items-center justify-center gap-3"
                                 style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%)' }}
                             >
-                                <FaPlay className="text-sm" /> Enter Dashboard
+                                <FaPlay className="text-sm" /> Enter Protocol
                             </Link>
                         ) : (
                             <Link
@@ -137,9 +138,9 @@ const Home = () => {
                                 <p className="text-gray-400 leading-relaxed text-sm mb-6">
                                     Automated bracket generation and real-time match tracking. Compete for glory and high-tier rewards.
                                 </p>
-                                <Link to="/tournaments" className="text-primary text-xs font-bold tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
+                                <a href="#" className="text-primary text-xs font-bold tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
                                     Access Module <FaArrowRight />
-                                </Link>
+                                </a>
                             </div>
                         </div>
 
@@ -159,9 +160,9 @@ const Home = () => {
                                 <p className="text-gray-400 leading-relaxed text-sm mb-6">
                                     Form alliances. Recruit operatives. Manage your team roster and challenge rival squads for dominance.
                                 </p>
-                                <Link to="/squads" className="text-secondary text-xs font-bold tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
+                                <a href="#" className="text-secondary text-xs font-bold tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
                                     Access Module <FaArrowRight />
-                                </Link>
+                                </a>
                             </div>
                         </div>
 
@@ -181,9 +182,9 @@ const Home = () => {
                                 <p className="text-gray-400 leading-relaxed text-sm mb-6">
                                     Connect with millions of gamers. Share stats, stream highlights, and build your legacy in the archive.
                                 </p>
-                                <Link to="/directory" className="text-accent text-xs font-bold tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
+                                <a href="#" className="text-accent text-xs font-bold tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
                                     Access Module <FaArrowRight />
-                                </Link>
+                                </a>
                             </div>
                         </div>
                     </div>

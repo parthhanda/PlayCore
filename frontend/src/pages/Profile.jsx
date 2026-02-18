@@ -15,7 +15,9 @@ import {
     FaGamepad,
     FaEdit,
     FaCheck,
-    FaSatelliteDish
+    FaUserCheck,
+    FaSatelliteDish,
+    FaComment
 } from 'react-icons/fa';
 import profileBgPattern from '../assets/backgrounds/profile-bg.jpg';
 
@@ -286,14 +288,20 @@ const Profile = () => {
                             ) : (
                                 <>
                                     {isFriend ? (
-                                        <>
-                                            <button className="flex items-center gap-2 px-6 py-2 bg-green-500/20 text-green-500 border border-green-500/50 rounded-full backdrop-blur-md font-bold text-xs tracking-widest uppercase hover:bg-green-500 hover:text-black transition-all">
-                                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div> MESSAGE
+                                        <div className="flex gap-3">
+                                            <button className="flex items-center gap-2 px-6 py-2 bg-green-500/20 text-green-500 border border-green-500/50 rounded-full backdrop-blur-md font-bold text-xs tracking-widest uppercase cursor-default">
+                                                <FaUserCheck /> LINKED
+                                            </button>
+                                            <button
+                                                onClick={() => window.dispatchEvent(new CustomEvent('open-private-chat', { detail: profileData }))}
+                                                className="flex items-center gap-2 px-6 py-2 bg-primary text-black border border-primary rounded-full backdrop-blur-md font-bold text-xs tracking-widest uppercase hover:bg-white transition-all shadow-[0_0_15px_rgba(0,255,255,0.4)]"
+                                            >
+                                                <FaComment /> MESSAGE
                                             </button>
                                             <button onClick={handleRemove} className="flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-500 border border-red-500/50 rounded-full backdrop-blur-md font-bold text-xs tracking-widest uppercase hover:bg-red-500 hover:text-white transition-all">
-                                                REMOVE
+                                                <FaTrash />
                                             </button>
-                                        </>
+                                        </div>
                                     ) : hasReceivedRequest ? (
                                         <button onClick={handleAccept} className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-black border border-orange-500 rounded-full backdrop-blur-md font-bold text-xs tracking-widest uppercase hover:bg-orange-400 transition-all shadow-[0_0_15px_rgba(255,165,0,0.5)] animate-pulse">
                                             <FaCheck /> ACCEPT REQUEST
