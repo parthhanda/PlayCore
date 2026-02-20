@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { FaTrophy, FaUsers, FaArrowRight, FaUserAstronaut, FaSatelliteDish } from 'react-icons/fa';
+import { getAvatarUrl } from '../utils/avatarUtils';
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
@@ -16,7 +17,7 @@ const Dashboard = () => {
                     <div className="relative">
                         <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-75"></div>
                         <img
-                            src={user.avatar ? `http://localhost:5000${user.avatar}` : 'https://via.placeholder.com/150'}
+                            src={getAvatarUrl(user.avatar)}
                             alt={user.username}
                             className="relative w-32 h-32 rounded-full border-4 border-black object-cover"
                         />

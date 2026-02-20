@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaShieldAlt, FaUserAstronaut, FaTrophy, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import { FaShieldAlt, FaTrophy, FaSignOutAlt, FaPlus } from 'react-icons/fa';
 import AuthContext from '../context/AuthContext';
 
 const SquadProfile = () => {
@@ -74,7 +74,6 @@ const SquadProfile = () => {
     );
 
     const isMember = user?.squad === squad._id;
-    const isCaptain = user?._id === squad.captain._id;
 
     return (
         <div className="min-h-screen bg-background text-white pt-24 px-4 pb-12 font-sans selection:bg-secondary selection:text-black">
@@ -161,7 +160,7 @@ const SquadProfile = () => {
                             className="bg-black/20 border border-white/5 p-4 rounded-xl flex items-center gap-4 hover:bg-white/5 hover:border-secondary/30 transition-all group"
                         >
                             <img
-                                src={member.avatar ? `http://localhost:5000${member.avatar}` : 'https://via.placeholder.com/50'}
+                                src={member.avatar ? `http://localhost:5000${member.avatar}` : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'}
                                 alt={member.username}
                                 className="w-12 h-12 rounded-lg object-cover bg-gray-900"
                             />

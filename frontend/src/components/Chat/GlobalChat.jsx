@@ -11,6 +11,7 @@ import {
     FaArrowLeft,
     FaLock
 } from 'react-icons/fa';
+import { getAvatarUrl } from '../../utils/avatarUtils';
 
 const ChatWidget = () => {
     const { socket, onlineUsers } = useSocket();
@@ -82,19 +83,8 @@ const ChatWidget = () => {
             });
         });
 
-        socket.on('hide_typing', ({ roomId }) => {
-            setTypingUsers(prev => {
-                const newState = { ...prev };
-                delete newState[roomId];
-                return newState;
-            });
-        });
-
         socket.on('chat_history', ({ roomId, messages }) => {
             if (messages && messages.length > 0) {
-                // Determine the other user's ID from the first message
-                // (Assuming the history is for the active private chat)
-                // A safer way is to use the roomId to map it
                 const [id1, id2] = roomId.split('_');
                 const otherId = id1 === user._id ? id2 : id1;
 
@@ -158,8 +148,6 @@ const ChatWidget = () => {
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             };
             socket.emit('send_message', msgData);
-            // Optimistic update handled by listener or we can add here if we filter own echo
-            // setGlobalMessages((prev) => [...prev, msgData]); 
             setGlobalMessage('');
         }
     };
@@ -167,14 +155,13 @@ const ChatWidget = () => {
     const sendPrivateMsg = (e) => {
         e.preventDefault();
         if (privateMessage.trim() && socket && activePrivateChat) {
-            // Room ID convention: sorted IDs
             const roomId = [user._id, activePrivateChat._id].sort().join('_');
 
             const msgData = {
                 roomId,
                 sender: user.username,
                 senderId: user._id,
-                receiverId: activePrivateChat._id, // Add receiver ID for logic
+                receiverId: activePrivateChat._id,
                 avatar: user.avatar,
                 message: privateMessage,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -182,15 +169,6 @@ const ChatWidget = () => {
 
             socket.emit('send_private_message', msgData);
             socket.emit('stop_typing', { roomId });
-
-            // Removed optimistic update to prevent duplicate messages (relying on socket event)
-            /* 
-            setPrivateMessages(prev => ({
-                ...prev,
-                [activePrivateChat._id]: [...(prev[activePrivateChat._id] || []), msgData]
-            }));
-            */
-
             setPrivateMessage('');
         }
     };
@@ -203,7 +181,6 @@ const ChatWidget = () => {
 
     if (!user) return null;
 
-    // Construct current room ID for typing check (if private)
     const currentPrivateRoomId = activePrivateChat ? [user._id, activePrivateChat._id].sort().join('_') : null;
 
     if (!isOpen) {
@@ -274,7 +251,7 @@ const ChatWidget = () => {
                                 {globalMessages.map((msg, index) => (
                                     <div key={index} className={`flex gap-3 ${msg.author === user.username ? 'flex-row-reverse' : ''}`}>
                                         <div className="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0 border border-white/10 overflow-hidden">
-                                            <img src={msg.avatar ? `http://localhost:5000${msg.avatar}` : 'https://via.placeholder.com/150'} alt={msg.author} className="w-full h-full object-cover" />
+                                            <img src={getAvatarUrl(msg.avatar)} alt={msg.author} className="w-full h-full object-cover bg-black" />
                                         </div>
                                         <div className={`flex flex-col max-w-[75%] ${msg.author === user.username ? 'items-end' : 'items-start'}`}>
                                             <div className="flex items-center gap-2 mb-1">
@@ -306,7 +283,7 @@ const ChatWidget = () => {
                                     >
                                         <div className="relative">
                                             <img
-                                                src={friend.avatar ? `http://localhost:5000${friend.avatar}` : 'https://via.placeholder.com/150'}
+                                                src={getAvatarUrl(friend.avatar)}
                                                 alt={friend.username}
                                                 className="w-10 h-10 rounded-full object-cover"
                                             />
@@ -344,7 +321,11 @@ const ChatWidget = () => {
                                     {(privateMessages[activePrivateChat._id] || []).map((msg, index) => (
                                         <div key={index} className={`flex gap-3 ${msg.sender === user.username ? 'flex-row-reverse' : ''}`}>
                                             <div className="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0 border border-white/10 overflow-hidden">
-                                                <img src={msg.avatar ? `http://localhost:5000${msg.avatar}` : 'https://via.placeholder.com/150'} alt={msg.sender} className="w-full h-full object-cover" />
+                                                <img
+                                                    src={msg.sender === user.username ? getAvatarUrl(user.avatar) : getAvatarUrl(activePrivateChat.avatar)}
+                                                    alt={msg.sender}
+                                                    className="w-full h-full object-cover bg-black"
+                                                />
                                             </div>
                                             <div className={`flex flex-col max-w-[75%] ${msg.sender === user.username ? 'items-end' : 'items-start'}`}>
                                                 <div className="flex items-center gap-2 mb-1">
@@ -359,22 +340,22 @@ const ChatWidget = () => {
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+                            </div>
+                        )}
 
-                                    {/* Typing Indicator */}
-                                    {typingUsers[currentPrivateRoomId] && typingUsers[currentPrivateRoomId] !== user.username && (
-                                        <div className="flex gap-3 animate-pulse">
-                                            <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
-                                                <div className="flex gap-1">
-                                                    <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                                                    <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                                                    <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                                                </div>
-                                            </div>
-                                            <div className="text-xs text-gray-500 flex items-center italic">
-                                                {typingUsers[currentPrivateRoomId]} is transmitting...
-                                            </div>
-                                        </div>
-                                    )}
+                        {/* Typing Indicator */}
+                        {typingUsers[currentPrivateRoomId] && typingUsers[currentPrivateRoomId] !== user.username && (
+                            <div className="flex gap-3 animate-pulse">
+                                <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
+                                    <div className="flex gap-1">
+                                        <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                                        <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                                        <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div className="text-xs text-gray-500 flex items-center italic">
+                                    {typingUsers[currentPrivateRoomId]} is transmitting...
                                 </div>
                             </div>
                         )}

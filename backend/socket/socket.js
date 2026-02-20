@@ -41,6 +41,7 @@ const initSocket = (server) => {
             // Fetch chat history
             try {
                 const messages = await Message.find({ roomId })
+                    .populate('senderId', 'avatar')
                     .sort({ createdAt: 1 })
                     .limit(50);
 
@@ -49,11 +50,11 @@ const initSocket = (server) => {
                     return {
                         roomId: msg.roomId,
                         sender: msg.sender,
-                        senderId: msg.senderId.toString(),
+                        senderId: msg.senderId._id ? msg.senderId._id.toString() : msg.senderId.toString(),
                         receiverId: msg.receiverId.toString(),
                         message: decryptedContent,
                         time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        avatar: msg.avatar // We might need to populate this if we want avatars in history
+                        avatar: msg.senderId.avatar || null
                     };
                 });
 

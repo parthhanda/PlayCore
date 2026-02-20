@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const fs = require('fs');
+const path = require('path');
 
 // @desc    Get user profile by username
 // @route   GET /api/users/u/:username
@@ -55,7 +57,18 @@ const updateUserProfile = async (req, res) => {
         }
 
         if (bio !== undefined) user.bio = bio;
-        if (avatar !== undefined) user.avatar = avatar;
+
+        if (avatar !== undefined) {
+            // Delete old avatar from filesystem if it exists and is different
+            if (user.avatar && user.avatar.startsWith('/uploads/') && user.avatar !== avatar) {
+                const oldImagePath = path.join(__dirname, '..', user.avatar);
+                fs.unlink(oldImagePath, (err) => {
+                    if (err) console.error("Error deleting old avatar:", err);
+                });
+            }
+            user.avatar = avatar;
+        }
+
         if (coverImage !== undefined) user.coverImage = coverImage;
         if (socialLinks) user.socialLinks = { ...user.socialLinks, ...socialLinks };
         if (gameConnections) user.gameConnections = gameConnections;

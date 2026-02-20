@@ -1,8 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaSearch, FaUserAstronaut, FaGamepad, FaWifi, FaUserFriends, FaSatelliteDish, FaCheck, FaTimes, FaGlobe } from 'react-icons/fa';
+import { FaSearch, FaUserAstronaut, FaWifi, FaUserFriends, FaSatelliteDish, FaCheck, FaTimes, FaGlobe } from 'react-icons/fa';
 import AuthContext from '../context/AuthContext';
+import { getAvatarUrl } from '../utils/avatarUtils';
 
 const Directory = () => {
     const { user, token } = useContext(AuthContext);
@@ -69,7 +70,7 @@ const Directory = () => {
         return users;
     };
 
-    const handleCardClick = (e, targetUsername) => {
+    const handleCardClick = (e) => {
         if (!user) {
             e.preventDefault();
             navigate('/login');
@@ -202,7 +203,7 @@ const Directory = () => {
                                     <Link
                                         to={`/u/${u.username}`}
                                         key={u._id}
-                                        onClick={(e) => handleCardClick(e, u.username)}
+                                        onClick={(e) => handleCardClick(e)}
                                         className="group relative bg-black/40 border border-white/5 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,255,255,0.1)]"
                                     >
                                         {/* Holographic Overlay */}
@@ -212,7 +213,7 @@ const Directory = () => {
                                             <div className="relative">
                                                 <div className="w-16 h-16 rounded-lg bg-gray-900 overflow-hidden border border-white/10 group-hover:border-primary/50 transition-colors">
                                                     {u.avatar ? (
-                                                        <img src={`http://localhost:5000${u.avatar}`} alt={u.username} className="w-full h-full object-cover" />
+                                                        <img src={getAvatarUrl(u.avatar)} alt={u.username} className="w-full h-full object-cover" />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-gray-600 group-hover:text-primary transition-colors">
                                                             <FaUserAstronaut className="text-2xl" />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaShieldAlt, FaPlus, FaSearch, FaUsers } from 'react-icons/fa';
+import { FaPlus, FaUsers } from 'react-icons/fa';
 import AuthContext from '../context/AuthContext';
 
 const Squads = () => {

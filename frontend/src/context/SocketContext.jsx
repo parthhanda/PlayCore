@@ -8,6 +8,7 @@ export const useSocket = () => {
     return useContext(SocketContext);
 };
 
+// eslint-disable-next-line react/prop-types
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);

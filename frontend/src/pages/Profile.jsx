@@ -17,12 +17,14 @@ import {
     FaCheck,
     FaUserCheck,
     FaSatelliteDish,
-    FaComment
+    FaComment,
+    FaTimes
 } from 'react-icons/fa';
 import profileBgPattern from '../assets/backgrounds/profile-bg.jpg';
+import { getAvatarUrl } from '../utils/avatarUtils';
 
 const Profile = () => {
-    const { user, token } = useContext(AuthContext);
+    const { user, token, setUser } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
     const [profileData, setProfileData] = useState({
@@ -141,6 +143,7 @@ const Profile = () => {
             });
 
             setProfileData({ ...profileData, ...data });
+            if (setUser) setUser(prev => ({ ...prev, ...data }));
             setEditing(false);
             setMessage('SYSTEM UPDATED');
             setTimeout(() => setMessage(''), 3000);
@@ -174,10 +177,9 @@ const Profile = () => {
         setProfileData({ ...profileData, gameConnections: updated });
     };
 
-    const getImageUrl = (path) => {
-        if (!path) return 'https://via.placeholder.com/150';
-        if (path.startsWith('http')) return path;
-        return `http://localhost:5000${path}`;
+    const handleRemoveAvatar = () => {
+        setImageFile(null);
+        setProfileData({ ...profileData, avatar: '' }); // Clear the avatar path in state
     };
 
     // Helper to format social links
@@ -326,19 +328,35 @@ const Profile = () => {
 
                     {/* Avatar & Info */}
                     <div className="px-8 pb-8 flex flex-col md:flex-row items-center md:items-end -mt-20 relative z-10 gap-6">
-                        <div className="relative group">
+                        <div className="relative group flex flex-col items-center">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-neon-blue to-secondary rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+
+                            {/* The Image Preview */}
                             <img
-                                src={getImageUrl(profileData.avatar)}
+                                src={imageFile ? URL.createObjectURL(imageFile) : getAvatarUrl(profileData.avatar)}
                                 alt="Avatar"
-                                className="w-40 h-40 rounded-full border-4 border-black object-cover relative z-10 bg-surface shadow-2xl"
+                                className={`w-40 h-40 rounded-full border-4 border-black object-cover relative z-10 bg-surface shadow-2xl ${editing ? 'opacity-80' : 'opacity-100'}`}
                             />
+
                             {editing && (
-                                <label className="absolute inset-0 z-20 rounded-full flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300 bg-black/50 backdrop-blur-sm border-2 border-primary border-dashed">
-                                    <FaCamera className="text-2xl text-primary mb-1" />
-                                    <span className="text-[9px] font-bold tracking-widest uppercase text-white">CHANGE</span>
-                                    <input type="file" className="hidden" onChange={handleFileChange} />
-                                </label>
+                                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center">
+                                    <label className="w-full h-full flex flex-col items-center justify-center rounded-full cursor-pointer bg-black/40 hover:bg-black/60 transition duration-300">
+                                        <FaCamera className="text-2xl text-white drop-shadow-md mb-1" />
+                                        <span className="text-[10px] font-bold tracking-widest uppercase text-white drop-shadow-md">UPLOAD</span>
+                                        <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                                    </label>
+
+                                    {/* Remove Button (Positioned just outside the circle at top right) */}
+                                    {(profileData.avatar || imageFile) && (
+                                        <button
+                                            onClick={handleRemoveAvatar}
+                                            className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-red-600 hover:bg-red-500 text-white p-2 rounded-full shadow-lg border-2 border-black transition z-30 transform hover:scale-110"
+                                            title="Remove Avatar"
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    )}
+                                </div>
                             )}
                         </div>
 

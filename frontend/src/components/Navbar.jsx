@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import AuthContext from '../context/AuthContext';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { getAvatarUrl } from '../utils/avatarUtils';
 
 const Navbar = () => {
     const { user, logout } = useContext(AuthContext);
@@ -16,21 +17,21 @@ const Navbar = () => {
 
     return (
         <nav className="bg-surface border-b border-white/10 p-4 sticky top-0 z-50">
-            <div className="container mx-auto flex justify-between items-center">
-                <Link to="/" className="text-2xl font-display font-bold text-white hover-glow-blue z-50 relative">
+            <div className="container mx-auto flex justify-between items-center gap-4">
+                <Link to="/" className="text-xl md:text-2xl font-display font-bold text-white hover-glow-blue z-50 relative whitespace-nowrap">
                     PLAY<span className="text-primary">CORE</span>
                 </Link>
 
                 {/* Mobile Menu Button */}
                 <button
-                    className="md:hidden text-white text-2xl z-50 relative focus:outline-none"
+                    className="lg:hidden text-white text-2xl z-50 relative focus:outline-none ml-auto"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     {isMenuOpen ? <FaTimes /> : <FaBars />}
                 </button>
 
                 {/* Desktop Menu */}
-                <div className="hidden md:flex items-center space-x-8">
+                <div className="hidden lg:flex items-center gap-4 xl:gap-8 flex-1 justify-end">
                     {/* Public Links */}
                     {navLinks.map((link) => (
                         <Link
@@ -60,13 +61,7 @@ const Navbar = () => {
                                     <div className="text-xs text-gray-400 group-hover:text-primary transition uppercase tracking-wider">Operative</div>
                                     <div className="font-bold leading-none">{user.username}</div>
                                 </div>
-                                {user.avatar ? (
-                                    <img src={`http://localhost:5000${user.avatar}`} alt="" className="w-10 h-10 rounded-full border border-neon-green object-cover group-hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] transition-all" />
-                                ) : (
-                                    <div className="w-10 h-10 rounded-full border border-neon-green bg-black flex items-center justify-center font-bold text-neon-green">
-                                        {user.username.charAt(0).toUpperCase()}
-                                    </div>
-                                )}
+                                <img src={getAvatarUrl(user.avatar)} alt="" className="w-10 h-10 rounded-full border border-neon-green object-cover group-hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] transition-all bg-black" />
                             </Link>
 
                             <button
@@ -107,8 +102,8 @@ const Navbar = () => {
 
                     {user ? (
                         <>
-                            <Link onClick={() => setIsMenuOpen(false)} to={`/u/${user.username}`} className="text-xl text-neon-green font-bold flex items-center gap-3 border border-white/10 p-4 rounded-xl bg-white/5">
-                                {user.avatar && <img src={`http://localhost:5000${user.avatar}`} alt="" className="w-12 h-12 rounded-full border border-neon-green object-cover" />}
+                            <Link onClick={() => setIsMenuOpen(false)} to={`/u/${user.username}`} className="text-xl text-neon-green font-bold flex items-center gap-3 border border-white/10 p-4 rounded-xl bg-white/5 w-full justify-center">
+                                <img src={getAvatarUrl(user.avatar)} alt="" className="w-12 h-12 rounded-full border border-neon-green object-cover bg-black" />
                                 <div>
                                     <div className="text-xs text-gray-400 uppercase tracking-wider">Logged in as</div>
                                     <div>{user.username}</div>

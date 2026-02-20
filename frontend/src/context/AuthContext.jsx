@@ -7,6 +7,7 @@ export const useAuth = () => {
     return useContext(AuthContext);
 };
 
+// eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('token') || null);
@@ -98,7 +99,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, error, login, register, logout }}>
+        <AuthContext.Provider value={{ user, setUser, token, setToken, loading, error, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );
