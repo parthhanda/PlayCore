@@ -1,17 +1,24 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 import Navbar from './components/Navbar';
-import ProtectedRoute from './components/ProtectedRoute';
+import Footer from './components/Footer';
+
+// Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
-import Directory from './pages/Directory';
+import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import Players from './pages/Players';
 import Squads from './pages/Squads';
 import SquadProfile from './pages/SquadProfile';
-import Dashboard from './pages/Dashboard';
-import Footer from './components/Footer';
-import { SocketProvider } from './context/SocketContext';
+import Tournaments from './pages/Tournaments';
+import CreateTournament from './pages/CreateTournament';
+import TournamentDetail from './pages/TournamentDetail';
+
+// Components
+import ProtectedRoute from './components/ProtectedRoute';
 import GlobalChat from './components/Chat/GlobalChat';
 
 function App() {
@@ -19,48 +26,34 @@ function App() {
     <Router>
       <AuthProvider>
         <SocketProvider>
-          <div className="min-h-screen bg-background font-sans text-white">
+          <div className="flex flex-col min-h-screen bg-background font-sans text-white">
             <Navbar />
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
 
-              {/* Protected Routes */}
+            <main className="flex-grow">
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/tournaments" element={<Tournaments />} />
 
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/u/:username"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Protected Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/u/:username" element={<Profile />} />
+                  <Route path="/players" element={<Players />} />
+                  <Route path="/squads" element={<Squads />} />
+                  <Route path="/squads/:id" element={<SquadProfile />} />
+                  <Route path="/tournaments/create" element={<CreateTournament />} />
+                  <Route path="/tournaments/:id" element={<TournamentDetail />} />
+                </Route>
 
-              {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/directory" element={<Directory />} />
-              <Route path="/squads" element={<Squads />} />
-              <Route path="/squad/:id" element={<SquadProfile />} />
+                {/* Catch all */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
 
-              {/* Catch all - redirect to home (which will redirect to login if not auth) */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
             <GlobalChat />
             <Footer />
           </div>

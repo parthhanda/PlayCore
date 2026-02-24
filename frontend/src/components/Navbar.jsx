@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import AuthContext from '../context/AuthContext';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUsers, FaTrophy, FaShieldAlt, FaGamepad } from 'react-icons/fa';
 import { getAvatarUrl } from '../utils/avatarUtils';
 
 const Navbar = () => {
@@ -102,13 +102,26 @@ const Navbar = () => {
 
                     {user ? (
                         <>
-                            <Link onClick={() => setIsMenuOpen(false)} to={`/u/${user.username}`} className="text-xl text-neon-green font-bold flex items-center gap-3 border border-white/10 p-4 rounded-xl bg-white/5 w-full justify-center">
-                                <img src={getAvatarUrl(user.avatar)} alt="" className="w-12 h-12 rounded-full border border-neon-green object-cover bg-black" />
-                                <div>
-                                    <div className="text-xs text-gray-400 uppercase tracking-wider">Logged in as</div>
-                                    <div>{user.username}</div>
+                            <div className="flex flex-col items-center border border-white/10 p-4 rounded-xl bg-white/5 w-full">
+                                <Link onClick={() => setIsMenuOpen(false)} to={`/u/${user.username}`} className="text-xl text-neon-green font-bold flex items-center gap-3 w-full justify-center mb-4">
+                                    <img src={getAvatarUrl(user.avatar)} alt="" className="w-12 h-12 rounded-full border border-neon-green object-cover bg-black" />
+                                    <div>
+                                        <div className="text-xs text-gray-400 uppercase tracking-wider">Logged in as</div>
+                                        <div>{user.username}</div>
+                                    </div>
+                                </Link>
+                                <div className="w-full mt-2 pt-4 border-t border-white/10 flex flex-col gap-4 justify-center items-center">
+                                    <Link onClick={() => setIsMenuOpen(false)} to="/players" className="text-gray-300 hover:text-white transition-colors duration-200 font-mono text-xs uppercase tracking-widest flex items-center">
+                                        <FaUsers className="mr-2 text-primary" /> Directory
+                                    </Link>
+                                    <Link onClick={() => setIsMenuOpen(false)} to="/tournaments" className="text-gray-300 hover:text-white transition-colors duration-200 font-mono text-xs uppercase tracking-widest flex items-center">
+                                        <FaTrophy className="mr-2 text-primary" /> Tournaments
+                                    </Link>
+                                    <Link onClick={() => setIsMenuOpen(false)} to="/tournaments/create" className="text-gray-300 hover:text-white transition-colors duration-200 font-mono text-xs uppercase tracking-widest flex items-center">
+                                        <FaGamepad className="mr-2 text-primary" /> Host
+                                    </Link>
                                 </div>
-                            </Link>
+                            </div>
                             <button
                                 onClick={() => { logout(); setIsMenuOpen(false); }}
                                 className="text-xl text-red-500 font-bold uppercase tracking-widest mt-4"

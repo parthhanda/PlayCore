@@ -35,6 +35,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/squads', require('./routes/squadRoutes'));
+app.use('/api/tournaments', require('./routes/tournamentRoutes'));
 
 // Serve static assets
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

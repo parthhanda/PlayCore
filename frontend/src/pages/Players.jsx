@@ -5,7 +5,7 @@ import { FaSearch, FaUserAstronaut, FaWifi, FaUserFriends, FaSatelliteDish, FaCh
 import AuthContext from '../context/AuthContext';
 import { getAvatarUrl } from '../utils/avatarUtils';
 
-const Directory = () => {
+const Players = () => {
     const { user, token } = useContext(AuthContext);
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
@@ -252,4 +252,4 @@ const Directory = () => {
     );
 };
 
-export default Directory;
+export default Players;
