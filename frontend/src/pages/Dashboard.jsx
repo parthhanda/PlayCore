@@ -59,7 +59,7 @@ const Dashboard = () => {
                     </Link>
 
                     {/* Operatives Module */}
-                    <Link to="/directory" className="group bg-black/40 border border-white/10 rounded-3xl p-8 hover:bg-white/5 hover:border-primary/50 transition-all duration-300 relative overflow-hidden">
+                    <Link to="/players" className="group bg-black/40 border border-white/10 rounded-3xl p-8 hover:bg-white/5 hover:border-primary/50 transition-all duration-300 relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                             <FaUserAstronaut className="text-8xl text-primary" />
                         </div>
@@ -85,7 +85,7 @@ const Dashboard = () => {
                     </Link>
 
                     {/* Comms Module */}
-                    <Link to="/directory" className="group bg-black/40 border border-white/10 rounded-3xl p-8 hover:bg-white/5 hover:border-neon-green/50 transition-all duration-300 relative overflow-hidden">
+                    <Link to="/players" className="group bg-black/40 border border-white/10 rounded-3xl p-8 hover:bg-white/5 hover:border-neon-green/50 transition-all duration-300 relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                             <FaSatelliteDish className="text-8xl text-neon-green" />
                         </div>

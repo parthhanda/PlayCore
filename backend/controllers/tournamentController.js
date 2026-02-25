@@ -243,11 +243,54 @@ const exportTournamentData = async (req, res) => {
     }
 };
 
+// @desc    Delete tournament (Terminate Operation)
+// @route   DELETE /api/tournaments/:id
+// @access  Private (Host Only)
+const deleteTournament = async (req, res) => {
+    try {
+        const tournament = await Tournament.findById(req.params.id);
+
+        if (!tournament) return res.status(404).json({ message: 'Tournament not found' });
+        if (tournament.host.toString() !== req.user.id.toString()) return res.status(403).json({ message: 'Not authorized as host' });
+
+        // Terminate associated matches
+        if (tournament.matches && tournament.matches.length > 0) {
+            await Match.deleteMany({ _id: { $in: tournament.matches } });
+        }
+
+        await tournament.deleteOne();
+        res.status(200).json({ message: 'Tournament Terminated' });
+    } catch (error) {
+        console.error("TERMINATE ERROR:", error);
+        res.status(500).json({ message: 'Server Error during Termination' });
+    }
+};
+
+// @desc    Get user enrolled tournaments
+// @route   GET /api/tournaments/enrolled
+// @access  Private
+const getEnrolledTournaments = async (req, res) => {
+    try {
+        const tournaments = await Tournament.find({
+            'enrolledPlayers.user': req.user.id
+        })
+            .populate('host', 'username avatar')
+            .select('title game startDate endDate status maxParticipants enrolledPlayers coverImage type')
+            .sort({ startDate: 1 });
+
+        res.status(200).json(tournaments);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getPublicTournaments,
     getTournamentById,
     createTournament,
     enrollTournament,
     startTournament,
-    exportTournamentData
+    exportTournamentData,
+    deleteTournament,
+    getEnrolledTournaments
 };

@@ -191,10 +191,63 @@ const TournamentDetail = () => {
                         </div>
 
                         {/* Bracket Area (Placeholder for now) */}
-                        <div className="bg-surface/80 backdrop-blur-md border border-white/10 p-8 rounded-2xl min-h-[300px] flex flex-col items-center justify-center">
-                            <FaShieldAlt className="text-6xl text-gray-700 mb-4 opacity-50" />
-                            <h2 className="text-xl font-black text-gray-500 tracking-widest uppercase mb-2">Bracket Network</h2>
-                            <p className="text-gray-600 font-mono text-xs">Awaiting structural generation from Host.</p>
+                        <div className="bg-surface/80 backdrop-blur-md border border-white/10 p-8 rounded-2xl min-h-[300px] flex flex-col">
+                            {tournament.status === 'registration' || !tournament.matches || tournament.matches.length === 0 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center opacity-70 py-12">
+                                    <FaShieldAlt className="text-6xl text-gray-700 mb-4 opacity-50" />
+                                    <h2 className="text-xl font-black text-gray-500 tracking-widest uppercase mb-2">Bracket Network</h2>
+                                    <p className="text-gray-600 font-mono text-xs">Awaiting structural generation from Host.</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <h2 className="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4 flex items-center mb-6">
+                                        <FaShieldAlt className="text-primary mr-3" /> Bracket Network
+                                    </h2>
+
+                                    <div className="space-y-8">
+                                        {Object.entries(
+                                            tournament.matches.reduce((acc, match) => {
+                                                if (!acc[match.roundNumber]) acc[match.roundNumber] = [];
+                                                acc[match.roundNumber].push(match);
+                                                return acc;
+                                            }, {})
+                                        ).sort(([a], [b]) => Number(a) - Number(b)).map(([roundNum, roundMatches]) => (
+                                            <div key={roundNum} className="bg-black/40 rounded-xl p-4 border border-white/5">
+                                                <h3 className="text-primary font-bold uppercase tracking-widest text-sm mb-4 border-b border-white/5 pb-2">
+                                                    Round {roundNum}
+                                                </h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {roundMatches.map((m, idx) => (
+                                                        <div key={m._id} className="bg-surface border border-white/10 p-4 rounded-lg flex flex-col relative overflow-hidden group hover:border-primary/50 transition-colors">
+                                                            <div className="absolute top-0 right-0 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-black/50 border-b border-l border-white/10 rounded-bl text-gray-400">
+                                                                Match {idx + 1}
+                                                            </div>
+                                                            <div className="space-y-2 mt-2">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="text-sm font-bold text-white truncate max-w-[150px]">
+                                                                        {m.participants && m.participants[0] && m.participants[0].participantId ? m.participants[0].participantId.username : <span className="text-gray-600 font-mono text-xs">TBD / BYE</span>}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="text-xs text-center text-gray-600 font-black italic">VS</div>
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="text-sm font-bold text-white truncate max-w-[150px]">
+                                                                        {m.participants && m.participants[1] && m.participants[1].participantId ? m.participants[1].participantId.username : <span className="text-gray-600 font-mono text-xs">TBD / BYE</span>}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="mt-3 pt-3 border-t border-white/5 flex justify-between items-center text-[10px] font-mono uppercase tracking-widest">
+                                                                <span className={m.status === 'completed' ? 'text-green-500' : 'text-orange-400'}>
+                                                                    {m.status}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -238,6 +291,25 @@ const TournamentDetail = () => {
                                     >
                                         {tournament.status === 'registration' ? 'Generate Bracket' : 'Bracket Locked'}
                                     </button>
+
+                                    <button
+                                        onClick={async () => {
+                                            if (window.confirm("Are you sure you want to terminate this operation? This will wipe all data and brackets permanently.")) {
+                                                try {
+                                                    await axios.delete(`http://localhost:5000/api/tournaments/${id}`, {
+                                                        headers: { Authorization: `Bearer ${token}` }
+                                                    });
+                                                    alert("OPERATION TERMINATED");
+                                                    navigate('/tournaments');
+                                                } catch (e) {
+                                                    alert(e.response?.data?.message || 'TERMINATION FAILED');
+                                                }
+                                            }
+                                        }}
+                                        className="w-full mt-4 py-3 rounded-xl border border-red-500/50 bg-red-500/10 text-red-500 font-bold text-xs tracking-widest uppercase hover:bg-red-500 hover:text-white transition-all shadow-[0_0_15px_rgba(255,0,0,0.1)] hover:shadow-[0_0_20px_rgba(255,0,0,0.4)]"
+                                    >
+                                        Terminate Operation
+                                    </button>
                                 </div>
                             ) : isEnrolled ? (
                                 <div className="text-center py-4">
@@ -245,7 +317,9 @@ const TournamentDetail = () => {
                                         ✓
                                     </div>
                                     <h3 className="text-lg font-bold text-green-400 uppercase tracking-widest mb-2">Enrolled</h3>
-                                    <p className="text-gray-400 font-mono text-xs">Awaiting bracket generation.</p>
+                                    <p className="text-gray-400 font-mono text-xs">
+                                        {tournament.status === 'in_progress' ? 'Bracket generated! Awaiting match.' : 'Awaiting bracket generation.'}
+                                    </p>
                                 </div>
                             ) : canEnroll ? (
                                 <div>
