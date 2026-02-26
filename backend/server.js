@@ -21,6 +21,9 @@ app.use(express.json());
 // Connect to Database
 connectDB();
 
+const { startCleanupJobs } = require('./utils/cleanupJobs');
+startCleanupJobs();
+
 // Basic Routes
 app.get('/', (req, res) => {
   res.send('PlayCore API is running...');

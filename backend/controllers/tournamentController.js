@@ -7,10 +7,28 @@ const User = require('../models/User');
 
 const getPublicTournaments = async (req, res) => {
     try {
-        const tournaments = await Tournament.find()
+        const now = new Date();
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+        const tournamentsDb = await Tournament.find({
+            $or: [
+                { endDate: { $exists: false } },
+                { endDate: null },
+                { endDate: { $gte: oneDayAgo } }
+            ]
+        })
             .populate('host', 'username avatar')
             .select('title game startDate endDate status maxParticipants enrolledPlayers coverImage type')
             .sort({ createdAt: -1 });
+
+        const tournaments = tournamentsDb.map(t => {
+            const tObj = t.toObject ? t.toObject() : t;
+            if (tObj.endDate && new Date(tObj.endDate) < now && tObj.status !== 'completed') {
+                tObj.status = 'completed';
+            }
+            return tObj;
+        });
+
         res.json(tournaments);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
@@ -271,12 +289,28 @@ const deleteTournament = async (req, res) => {
 // @access  Private
 const getEnrolledTournaments = async (req, res) => {
     try {
-        const tournaments = await Tournament.find({
-            'enrolledPlayers.user': req.user.id
+        const now = new Date();
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+        const tournamentsDb = await Tournament.find({
+            'enrolledPlayers.user': req.user.id,
+            $or: [
+                { endDate: { $exists: false } },
+                { endDate: null },
+                { endDate: { $gte: oneDayAgo } }
+            ]
         })
             .populate('host', 'username avatar')
             .select('title game startDate endDate status maxParticipants enrolledPlayers coverImage type')
             .sort({ startDate: 1 });
+
+        const tournaments = tournamentsDb.map(t => {
+            const tObj = t.toObject ? t.toObject() : t;
+            if (tObj.endDate && new Date(tObj.endDate) < now && tObj.status !== 'completed') {
+                tObj.status = 'completed';
+            }
+            return tObj;
+        });
 
         res.status(200).json(tournaments);
     } catch (error) {
