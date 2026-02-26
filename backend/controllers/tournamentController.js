@@ -103,7 +103,7 @@ const startTournament = async (req, res) => {
         const tournament = await Tournament.findById(req.params.id);
 
         if (!tournament) return res.status(404).json({ message: 'Tournament not found' });
-        if (tournament.host.toString() !== req.user.id.toString()) return res.status(403).json({ message: 'Not authorized as host' });
+        if (tournament.host.toString() !== req.user._id.toString()) return res.status(403).json({ message: 'Not authorized as host' });
         if (tournament.status !== 'registration') return res.status(400).json({ message: 'Tournament is already in progress or completed' });
 
         const players = [...tournament.enrolledPlayers];
@@ -266,17 +266,26 @@ const exportTournamentData = async (req, res) => {
 // @access  Private (Host Only)
 const deleteTournament = async (req, res) => {
     try {
+        console.log(`[DELETE OP] Attempting to terminate tournament ID: ${req.params.id} by user: ${req.user._id}`);
         const tournament = await Tournament.findById(req.params.id);
 
-        if (!tournament) return res.status(404).json({ message: 'Tournament not found' });
-        if (tournament.host.toString() !== req.user.id.toString()) return res.status(403).json({ message: 'Not authorized as host' });
+        if (!tournament) {
+            console.log(`[DELETE OP] Tournament not found`);
+            return res.status(404).json({ message: 'Tournament not found' });
+        }
+        if (tournament.host.toString() !== req.user._id.toString()) {
+            console.log(`[DELETE OP] Not authorized. Host is ${tournament.host}, requesting user is ${req.user._id}`);
+            return res.status(403).json({ message: 'Not authorized as host' });
+        }
 
         // Terminate associated matches
         if (tournament.matches && tournament.matches.length > 0) {
-            await Match.deleteMany({ _id: { $in: tournament.matches } });
+            const matchDel = await Match.deleteMany({ _id: { $in: tournament.matches } });
+            console.log(`[DELETE OP] Deleted ${matchDel.deletedCount} associated matches`);
         }
 
-        await tournament.deleteOne();
+        const delResult = await tournament.deleteOne();
+        console.log(`[DELETE OP] Successfully terminated tournament, result:`, delResult);
         res.status(200).json({ message: 'Tournament Terminated' });
     } catch (error) {
         console.error("TERMINATE ERROR:", error);

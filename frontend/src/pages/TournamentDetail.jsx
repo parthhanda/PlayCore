@@ -21,6 +21,7 @@ const TournamentDetail = () => {
     });
     const [enrollLoading, setEnrollLoading] = useState(false);
     const [enrollMessage, setEnrollMessage] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     useEffect(() => {
         const fetchTournament = async () => {
@@ -292,24 +293,43 @@ const TournamentDetail = () => {
                                         {tournament.status === 'registration' ? 'Generate Bracket' : 'Bracket Locked'}
                                     </button>
 
-                                    <button
-                                        onClick={async () => {
-                                            if (window.confirm("Are you sure you want to terminate this operation? This will wipe all data and brackets permanently.")) {
-                                                try {
-                                                    await axios.delete(`http://localhost:5000/api/tournaments/${id}`, {
-                                                        headers: { Authorization: `Bearer ${token}` }
-                                                    });
-                                                    alert("OPERATION TERMINATED");
-                                                    navigate('/tournaments');
-                                                } catch (e) {
-                                                    alert(e.response?.data?.message || 'TERMINATION FAILED');
-                                                }
-                                            }
-                                        }}
-                                        className="w-full mt-4 py-3 rounded-xl border border-red-500/50 bg-red-500/10 text-red-500 font-bold text-xs tracking-widest uppercase hover:bg-red-500 hover:text-white transition-all shadow-[0_0_15px_rgba(255,0,0,0.1)] hover:shadow-[0_0_20px_rgba(255,0,0,0.4)]"
-                                    >
-                                        Terminate Operation
-                                    </button>
+                                    {!showDeleteConfirm ? (
+                                        <button
+                                            onClick={() => setShowDeleteConfirm(true)}
+                                            className="w-full mt-4 py-3 rounded-xl border border-red-500/50 bg-red-500/10 text-red-500 font-bold text-xs tracking-widest uppercase hover:bg-red-500 hover:text-white transition-all shadow-[0_0_15px_rgba(255,0,0,0.1)] hover:shadow-[0_0_20px_rgba(255,0,0,0.4)]"
+                                        >
+                                            Terminate Operation
+                                        </button>
+                                    ) : (
+                                        <div className="w-full mt-4 p-4 border border-red-500/50 bg-red-900/20 rounded-xl flex flex-col items-center">
+                                            <p className="text-red-400 font-bold text-[10px] mb-3 uppercase tracking-widest text-center">Are you sure? This will wipe all data permanently.</p>
+                                            <div className="flex gap-2 w-full">
+                                                <button
+                                                    onClick={() => setShowDeleteConfirm(false)}
+                                                    className="flex-1 py-2 bg-black hover:bg-white/10 text-gray-400 text-[10px] font-bold rounded-lg uppercase tracking-widest transition-colors border border-white/10"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            await axios.delete(`http://localhost:5000/api/tournaments/${id}`, {
+                                                                headers: { Authorization: `Bearer ${token}` }
+                                                            });
+                                                            alert("OPERATION TERMINATED");
+                                                            navigate('/tournaments');
+                                                        } catch (e) {
+                                                            alert(e.response?.data?.message || 'TERMINATION FAILED');
+                                                            setShowDeleteConfirm(false);
+                                                        }
+                                                    }}
+                                                    className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-widest transition-colors shadow-[0_0_10px_rgba(255,0,0,0.3)]"
+                                                >
+                                                    Confirm
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ) : isEnrolled ? (
                                 <div className="text-center py-4">
