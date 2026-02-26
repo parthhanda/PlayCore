@@ -40,6 +40,8 @@ const initSocket = (server) => {
 
             // Fetch chat history
             try {
+                const isSquad = roomId.startsWith('squad_');
+
                 const messages = await Message.find({ roomId })
                     .populate('senderId', 'avatar')
                     .sort({ createdAt: 1 })
@@ -51,10 +53,11 @@ const initSocket = (server) => {
                         roomId: msg.roomId,
                         sender: msg.sender,
                         senderId: msg.senderId._id ? msg.senderId._id.toString() : msg.senderId.toString(),
-                        receiverId: msg.receiverId.toString(),
+                        receiverId: isSquad ? null : (msg.receiverId ? msg.receiverId.toString() : null),
                         message: decryptedContent,
                         time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        avatar: msg.senderId.avatar || null
+                        avatar: msg.senderId.avatar || null,
+                        isSquad
                     };
                 });
 
@@ -69,12 +72,13 @@ const initSocket = (server) => {
 
             try {
                 const { iv, content } = encrypt(data.message);
+                const isSquad = data.roomId.startsWith('squad_');
 
                 const newMessage = new Message({
                     roomId: data.roomId,
                     sender: data.sender,
                     senderId: data.senderId,
-                    receiverId: data.receiverId,
+                    receiverId: isSquad ? undefined : data.receiverId,
                     content,
                     iv
                 });

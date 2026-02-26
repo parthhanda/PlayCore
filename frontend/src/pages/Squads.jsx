@@ -37,7 +37,7 @@ const Squads = () => {
             });
             setShowCreateModal(false);
             // navigate to new squad
-            navigate(`/squad/${data._id}`);
+            navigate(`/squads/${data._id}`);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create squad');
         }
@@ -73,7 +73,7 @@ const Squads = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {squads.map((squad) => (
                             <Link
-                                to={`/squad/${squad._id}`}
+                                to={`/squads/${squad._id}`}
                                 key={squad._id}
                                 className="group relative bg-black/40 border border-white/10 rounded-2xl overflow-hidden hover:border-secondary/50 transition-all duration-300 hover:transform hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(255,0,255,0.15)] flex flex-col"
                             >

@@ -46,6 +46,7 @@ const registerUser = async (req, res) => {
                 friends: user.friends,
                 friendRequests: user.friendRequests,
                 sentRequests: user.sentRequests,
+                squad: user.squad,
                 token: generateToken(user._id),
             });
         } else {
@@ -79,6 +80,7 @@ const loginUser = async (req, res) => {
                 friends: user.friends,
                 friendRequests: user.friendRequests,
                 sentRequests: user.sentRequests,
+                squad: user.squad,
                 token: generateToken(user._id),
             });
         } else {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaShieldAlt, FaTrophy, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import { FaShieldAlt, FaTrophy, FaSignOutAlt, FaPlus, FaCommentAlt, FaTimes } from 'react-icons/fa';
 import AuthContext from '../context/AuthContext';
 
 const SquadProfile = () => {
@@ -46,19 +46,44 @@ const SquadProfile = () => {
     };
 
     const handleLeave = async () => {
-        if (!confirm('Are you sure you want to leave this squad?')) return;
+        if (!window.confirm('Are you sure you want to leave this squad?')) return;
 
         setActionLoading(true);
         try {
             await axios.post('http://localhost:5000/api/squads/leave', {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            window.location.reload();
+            navigate('/squads');
+            // Slight delay so navigate happens first before context refresh if needed
+            setTimeout(() => window.location.reload(), 100);
         } catch (err) {
             alert(err.response?.data?.message || 'Failed to leave');
         } finally {
             setActionLoading(false);
         }
+    };
+
+    const handleDisband = async () => {
+        if (!window.confirm('WARNING: Are you sure you want to DISBAND this squad completely? This action cannot be undone.')) return;
+
+        setActionLoading(true);
+        try {
+            await axios.delete(`http://localhost:5000/api/squads/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            navigate('/squads');
+            setTimeout(() => window.location.reload(), 100);
+        } catch (err) {
+            alert(err.response?.data?.message || 'Failed to disband');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleOpenChat = () => {
+        // Dispatch a custom event that GlobalChat listens for
+        const event = new CustomEvent('open-squad-chat', { detail: squad });
+        window.dispatchEvent(event);
     };
 
     if (loading) return (
@@ -123,13 +148,33 @@ const SquadProfile = () => {
                         {/* Actions */}
                         <div className="flex flex-col gap-3 min-w-[200px]">
                             {isMember ? (
-                                <button
-                                    onClick={handleLeave}
-                                    disabled={actionLoading}
-                                    className="w-full py-4 rounded-xl bg-red-600/20 text-red-500 border border-red-500/50 font-bold text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2"
-                                >
-                                    <FaSignOutAlt /> Leave Squad
-                                </button>
+                                <>
+                                    <button
+                                        onClick={handleOpenChat}
+                                        disabled={actionLoading}
+                                        className="w-full py-3 rounded-xl bg-primary/20 text-primary border border-primary/50 font-bold text-xs uppercase tracking-widest hover:bg-primary hover:text-black transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:shadow-[0_0_20px_rgba(0,255,255,0.4)]"
+                                    >
+                                        <FaCommentAlt /> Secure Comms
+                                    </button>
+
+                                    {squad.captain._id === user._id ? (
+                                        <button
+                                            onClick={handleDisband}
+                                            disabled={actionLoading}
+                                            className="w-full py-3 rounded-xl bg-red-900/40 text-red-500 border border-red-500/50 font-bold text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <FaTimes /> Disband Squad
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleLeave}
+                                            disabled={actionLoading}
+                                            className="w-full py-3 rounded-xl bg-red-600/20 text-red-500 border border-red-500/50 font-bold text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <FaSignOutAlt /> Leave Squad
+                                        </button>
+                                    )}
+                                </>
                             ) : user ? (
                                 <button
                                     onClick={handleJoin}

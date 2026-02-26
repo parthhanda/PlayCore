@@ -177,10 +177,52 @@ const leaveSquad = async (req, res) => {
     }
 };
 
+// @desc    Delete a squad (Disband Squad)
+// @route   DELETE /api/squads/:id
+// @access  Private
+const deleteSquad = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const squad = await Squad.findById(req.params.id).session(session);
+
+        if (!squad) {
+            await session.abortTransaction();
+            return res.status(404).json({ message: 'Squad not found' });
+        }
+
+        // Only captain can disband
+        if (squad.captain.toString() !== req.user._id.toString()) {
+            await session.abortTransaction();
+            return res.status(403).json({ message: 'Not authorized: Only the captain can disband the squad' });
+        }
+
+        // Nullify squad reference for all members
+        await User.updateMany(
+            { _id: { $in: squad.members } },
+            { $set: { squad: null } }
+        ).session(session);
+
+        // Delete the squad
+        await Squad.findByIdAndDelete(squad._id).session(session);
+
+        await session.commitTransaction();
+        res.json({ message: 'Squad has been disbanded' });
+    } catch (error) {
+        await session.abortTransaction();
+        console.error("Error deleting squad:", error);
+        res.status(500).json({ message: 'Server error while disbanding squad' });
+    } finally {
+        session.endSession();
+    }
+};
+
 module.exports = {
     createSquad,
     getSquads,
     getSquad,
     joinSquad,
-    leaveSquad
+    leaveSquad,
+    deleteSquad
 };

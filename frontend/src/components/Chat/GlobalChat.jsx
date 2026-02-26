@@ -9,7 +9,8 @@ import {
     FaExpand,
     FaMinus,
     FaArrowLeft,
-    FaLock
+    FaLock,
+    FaShieldAlt
 } from 'react-icons/fa';
 import { getAvatarUrl } from '../../utils/avatarUtils';
 
@@ -20,14 +21,15 @@ const ChatWidget = () => {
     // UI State
     const [isOpen, setIsOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
-    const [activeTab, setActiveTab] = useState('global'); // 'global' or 'friends'
+    const [activeTab, setActiveTab] = useState('global'); // 'global', 'friends', or 'squad'
     const [activePrivateChat, setActivePrivateChat] = useState(null); // userData object if chatting privately
+    const [squadData, setSquadData] = useState(null); // stores squad data for group chat
 
     // Data State
     const [globalMessage, setGlobalMessage] = useState('');
     const [privateMessage, setPrivateMessage] = useState('');
     const [globalMessages, setGlobalMessages] = useState([]);
-    const [privateMessages, setPrivateMessages] = useState({}); // { friendId: [msgs] }
+    const [privateMessages, setPrivateMessages] = useState({}); // { roomId: [msgs] }
     const [friends, setFriends] = useState([]);
 
     const messagesEndRef = useRef(null);
@@ -61,13 +63,19 @@ const ChatWidget = () => {
 
         socket.on('receive_private_message', (data) => {
             // data: { roomId, sender, message, time, senderId }
-            const otherId = data.senderId === user._id ? data.receiverId : data.senderId;
+            let channelKey;
+
+            if (data.roomId.startsWith('squad_')) {
+                channelKey = data.roomId;
+            } else {
+                channelKey = data.senderId === user._id ? data.receiverId : data.senderId;
+            }
 
             // Mark as unseen if chat not open? (Implementation for later: Badges)
 
             setPrivateMessages(prev => ({
                 ...prev,
-                [otherId]: [...(prev[otherId] || []), data]
+                [channelKey]: [...(prev[channelKey] || []), data]
             }));
         });
 
@@ -85,18 +93,26 @@ const ChatWidget = () => {
 
         socket.on('chat_history', ({ roomId, messages }) => {
             if (messages && messages.length > 0) {
-                const [id1, id2] = roomId.split('_');
-                const otherId = id1 === user._id ? id2 : id1;
+                let channelKey = roomId;
+
+                if (!roomId.startsWith('squad_')) {
+                    const [id1, id2] = roomId.split('_');
+                    channelKey = id1 === user._id ? id2 : id1;
+                }
 
                 setPrivateMessages(prev => ({
                     ...prev,
-                    [otherId]: messages
+                    [channelKey]: messages
                 }));
             }
         });
 
-        // Join global room
+        // Join global room and squad room
         socket.emit('join_room', 'global');
+        if (user && user.squad) {
+            const roomId = `squad_${user.squad}`;
+            socket.emit('join_private_chat', { roomId });
+        }
 
         return () => {
             socket.off('receive_message');
@@ -107,7 +123,7 @@ const ChatWidget = () => {
         };
     }, [socket, user]);
 
-    // Listen for external open chat requests (from Profile)
+    // Listen for external open chat requests
     useEffect(() => {
         const handleOpenChat = (event) => {
             const friend = event.detail;
@@ -117,8 +133,24 @@ const ChatWidget = () => {
             startPrivateChat(friend);
         };
 
+        const handleOpenSquadChat = (event) => {
+            const squad = event.detail;
+            setIsOpen(true);
+            setIsMinimized(false);
+            setActivePrivateChat(null);
+            setActiveTab('squad');
+            setSquadData(squad);
+            const roomId = `squad_${squad._id}`;
+            socket.emit('join_private_chat', { roomId });
+        };
+
         window.addEventListener('open-private-chat', handleOpenChat);
-        return () => window.removeEventListener('open-private-chat', handleOpenChat);
+        window.addEventListener('open-squad-chat', handleOpenSquadChat);
+
+        return () => {
+            window.removeEventListener('open-private-chat', handleOpenChat);
+            window.removeEventListener('open-squad-chat', handleOpenSquadChat);
+        };
     }, [socket, user]);
 
 
@@ -154,7 +186,25 @@ const ChatWidget = () => {
 
     const sendPrivateMsg = (e) => {
         e.preventDefault();
-        if (privateMessage.trim() && socket && activePrivateChat) {
+
+        // Handle normal private message OR squad chat based on active tab
+        if (activeTab === 'squad' && privateMessage.trim() && socket && user.squad) {
+            const roomId = `squad_${user.squad}`;
+
+            const msgData = {
+                roomId,
+                sender: user.username,
+                senderId: user._id,
+                receiverId: null, // Broadcast to room
+                avatar: user.avatar,
+                message: privateMessage,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            };
+
+            socket.emit('send_private_message', msgData);
+            socket.emit('stop_typing', { roomId });
+            setPrivateMessage('');
+        } else if (activePrivateChat && privateMessage.trim() && socket) {
             const roomId = [user._id, activePrivateChat._id].sort().join('_');
 
             const msgData = {
@@ -181,7 +231,7 @@ const ChatWidget = () => {
 
     if (!user) return null;
 
-    const currentPrivateRoomId = activePrivateChat ? [user._id, activePrivateChat._id].sort().join('_') : null;
+    const currentPrivateRoomId = activeTab === 'squad' && user.squad ? `squad_${user.squad}` : (activePrivateChat ? [user._id, activePrivateChat._id].sort().join('_') : null);
 
     if (!isOpen) {
         return (
@@ -202,7 +252,7 @@ const ChatWidget = () => {
                 <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                     <h3 className="font-display font-bold text-white tracking-widest uppercase text-sm">
-                        {activePrivateChat ? activePrivateChat.username : 'Comms System'}
+                        {activeTab === 'squad' ? (squadData?.name || 'Squad Comms') : (activePrivateChat ? activePrivateChat.username : 'Comms System')}
                     </h3>
                 </div>
                 <div className="flex items-center gap-2">
@@ -229,16 +279,28 @@ const ChatWidget = () => {
                         <div className="flex border-b border-white/10">
                             <button
                                 onClick={() => setActiveTab('global')}
-                                className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors ${activeTab === 'global' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
+                                className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 transition-colors ${activeTab === 'global' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
                             >
                                 <FaGlobe /> Global
                             </button>
                             <button
                                 onClick={() => setActiveTab('friends')}
-                                className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors ${activeTab === 'friends' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
+                                className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 transition-colors ${activeTab === 'friends' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
                             >
                                 <FaUserFriends /> Friends
                             </button>
+                            {user.squad && (
+                                <button
+                                    onClick={() => {
+                                        setActiveTab('squad');
+                                        const roomId = `squad_${user.squad}`;
+                                        socket.emit('join_private_chat', { roomId });
+                                    }}
+                                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 transition-colors ${activeTab === 'squad' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    <FaShieldAlt /> Squad
+                                </button>
+                            )}
                         </div>
                     )}
 
@@ -297,6 +359,43 @@ const ChatWidget = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+
+                        {/* SQUAD CHAT */}
+                        {activeTab === 'squad' && user.squad && (
+                            <div className="flex flex-col h-full">
+                                <div className="space-y-4">
+                                    <div className="text-center my-4">
+                                        <p className="text-[10px] text-green-500/70 border border-green-500/30 bg-green-500/10 px-3 py-1 rounded inline-block uppercase tracking-widest font-mono">
+                                            <FaShieldAlt className="inline-block mr-1 mb-0.5" />
+                                            Tactical Channel: Encrypted Squad Comms
+                                        </p>
+                                    </div>
+
+                                    {(privateMessages[`squad_${user.squad}`] || []).map((msg, index) => (
+                                        <div key={index} className={`flex gap-3 ${msg.sender === user.username ? 'flex-row-reverse' : ''}`}>
+                                            <div className="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0 border border-white/10 overflow-hidden">
+                                                <img
+                                                    src={getAvatarUrl(msg.avatar)}
+                                                    alt={msg.sender}
+                                                    className="w-full h-full object-cover bg-black"
+                                                />
+                                            </div>
+                                            <div className={`flex flex-col max-w-[75%] ${msg.sender === user.username ? 'items-end' : 'items-start'}`}>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${msg.sender === user.username ? 'text-primary' : 'text-secondary'}`}>
+                                                        {msg.sender}
+                                                    </span>
+                                                    <span className="text-[10px] text-gray-600">{msg.time}</span>
+                                                </div>
+                                                <div className={`px-4 py-2 rounded-2xl text-sm ${msg.sender === user.username ? 'bg-primary/20 text-primary border border-primary/20 rounded-tr-none' : 'bg-white/10 text-gray-200 border border-white/5 rounded-tl-none'}`}>
+                                                    {msg.message}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
@@ -364,21 +463,24 @@ const ChatWidget = () => {
                     </div>
 
                     {/* Input Area */}
-                    <form onSubmit={activePrivateChat ? sendPrivateMsg : sendGlobalMessage} className="p-4 border-t border-white/10 bg-black/40 rounded-b-2xl">
-                        {(activeTab === 'global' || activePrivateChat) ? (
+                    <form onSubmit={(activePrivateChat || activeTab === 'squad') ? sendPrivateMsg : sendGlobalMessage} className="p-4 border-t border-white/10 bg-black/40 rounded-b-2xl">
+                        {(activeTab === 'global' || activePrivateChat || activeTab === 'squad') ? (
                             <div className="flex gap-2">
                                 <input
                                     type="text"
-                                    value={activePrivateChat ? privateMessage : globalMessage}
+                                    value={(activePrivateChat || activeTab === 'squad') ? privateMessage : globalMessage}
                                     onChange={(e) => {
-                                        if (activePrivateChat) {
+                                        if (activeTab === 'squad') {
+                                            setPrivateMessage(e.target.value);
+                                            handleTyping(`squad_${user.squad}`);
+                                        } else if (activePrivateChat) {
                                             setPrivateMessage(e.target.value);
                                             handleTyping([user._id, activePrivateChat._id].sort().join('_'));
                                         } else {
                                             setGlobalMessage(e.target.value);
                                         }
                                     }}
-                                    placeholder={activePrivateChat ? `Message ${activePrivateChat.username}...` : "TRANSMIT GLOBAL MESSAGE..."}
+                                    placeholder={(activeTab === 'squad') ? "TRANSMIT SQUAD MESSAGE..." : (activePrivateChat ? `Message ${activePrivateChat.username}...` : "TRANSMIT GLOBAL MESSAGE...")}
                                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors placeholder:text-gray-600 tracking-wide"
                                 />
                                 <button

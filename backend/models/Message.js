@@ -17,8 +17,8 @@ const MessageSchema = new mongoose.Schema({
     },
     receiverId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: 'User'
+        // optional for squad chat
     },
     content: {
         type: String, // Encrypted content
