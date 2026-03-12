@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const fs = require('fs');
 const path = require('path');
+const cascadeDeleteUser = require('../utils/cascadeDeleteUser');
 
 // @desc    Get user profile by username
 // @route   GET /api/users/u/:username
@@ -228,6 +229,22 @@ const getFriendsList = async (req, res) => {
     }
 };
 
+// @desc    Delete own account (self-delete with cascade)
+// @route   DELETE /api/users/profile
+// @access  Private
+const deleteOwnAccount = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const summary = await cascadeDeleteUser(user._id);
+        res.json({ message: 'Your account and all associated data have been permanently deleted.', summary });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getUserProfile,
     updateUserProfile,
@@ -236,5 +253,6 @@ module.exports = {
     sendFriendRequest,
     acceptFriendRequest,
     declineFriendRequest,
-    removeFriend
+    removeFriend,
+    deleteOwnAccount
 };

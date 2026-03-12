@@ -10,8 +10,8 @@ const Navbar = () => {
 
     const navLinks = [
         { name: 'Home', path: '/' },
+        { name: 'Intel', path: '/news' },
         { name: 'Tournaments', path: '/tournaments' },
-        { name: 'About Us', path: '/about' },
         { name: 'Contact', path: '/contact' },
     ];
 
@@ -50,6 +50,16 @@ const Navbar = () => {
                             className="text-gray-300 hover:text-secondary hover:drop-shadow-[0_0_5px_rgba(255,0,255,0.8)] transition-all duration-300 font-display tracking-wide uppercase text-sm"
                         >
                             Dashboard
+                        </Link>
+                    )}
+
+                    {/* Admin MCP Link */}
+                    {user && user.roles?.includes('admin') && (
+                        <Link
+                            to="/admin/panel"
+                            className="text-red-500 hover:text-red-400 hover:drop-shadow-[0_0_8px_rgba(255,0,0,0.8)] transition-all duration-300 font-display tracking-wide uppercase text-sm flex items-center gap-1.5"
+                        >
+                            <FaShieldAlt className="text-xs" /> MCP
                         </Link>
                     )}
 
@@ -120,6 +130,16 @@ const Navbar = () => {
                                     <Link onClick={() => setIsMenuOpen(false)} to="/tournaments/create" className="text-gray-300 hover:text-white transition-colors duration-200 font-mono text-xs uppercase tracking-widest flex items-center">
                                         <FaGamepad className="mr-2 text-primary" /> Host
                                     </Link>
+                                    {user.roles && user.roles.includes('admin') && (
+                                        <>
+                                            <Link onClick={() => setIsMenuOpen(false)} to="/admin/news/create" className="text-gray-300 hover:text-white transition-colors duration-200 font-mono text-xs uppercase tracking-widest flex items-center">
+                                                <FaShieldAlt className="mr-2 text-primary" /> Draft Intel
+                                            </Link>
+                                            <Link onClick={() => setIsMenuOpen(false)} to="/admin/panel" className="text-red-400 hover:text-red-300 transition-colors duration-200 font-mono text-xs uppercase tracking-widest flex items-center">
+                                                <FaShieldAlt className="mr-2 text-red-500" /> MCP Panel
+                                            </Link>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             <button

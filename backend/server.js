@@ -39,6 +39,10 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/squads', require('./routes/squadRoutes'));
 app.use('/api/tournaments', require('./routes/tournamentRoutes'));
+app.use('/api/posts', require('./routes/postRoutes'));
+app.use('/api/comments', require('./routes/commentRoutes'));
+app.use('/api/upload', require('./routes/gridUploadRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Serve static assets
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

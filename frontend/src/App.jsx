@@ -21,6 +21,14 @@ import TournamentDetail from './pages/TournamentDetail';
 import ProtectedRoute from './components/ProtectedRoute';
 import GlobalChat from './components/Chat/GlobalChat';
 
+// Blog Pages
+import News from './pages/News';
+import PostDetail from './pages/PostDetail';
+import CreatePost from './pages/CreatePost';
+
+// Admin
+import AdminPanel from './pages/AdminPanel';
+
 function App() {
   return (
     <Router>
@@ -36,10 +44,13 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/tournaments" element={<Tournaments />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/news/:slug" element={<PostDetail />} />
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/admin/news/create" element={<CreatePost />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/u/:username" element={<Profile />} />
                   <Route path="/players" element={<Players />} />
@@ -47,6 +58,7 @@ function App() {
                   <Route path="/squads/:id" element={<SquadProfile />} />
                   <Route path="/tournaments/create" element={<CreateTournament />} />
                   <Route path="/tournaments/:id" element={<TournamentDetail />} />
+                  <Route path="/admin/panel" element={<AdminPanel />} />
                 </Route>
 
                 {/* Catch all */}

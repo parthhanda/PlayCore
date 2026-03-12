@@ -24,7 +24,7 @@ import profileBgPattern from '../assets/backgrounds/profile-bg.jpg';
 import { getAvatarUrl } from '../utils/avatarUtils';
 
 const Profile = () => {
-    const { user, token, setUser } = useContext(AuthContext);
+    const { user, token, setUser, logout } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
     const [profileData, setProfileData] = useState({
@@ -582,14 +582,42 @@ const Profile = () => {
                         </div>
 
                         {editing && (
-                            <div className="flex justify-end pt-4 animate-fade-in-up">
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={uploading}
-                                    className="bg-primary text-black font-black py-4 px-8 rounded-xl text-sm tracking-[0.2em] shadow-[0_0_20px_rgba(0,255,255,0.4)] hover:shadow-[0_0_40px_rgba(0,255,255,0.6)] hover:scale-[1.02] transition-all duration-300 uppercase w-full md:w-auto"
-                                >
-                                    {uploading ? 'PROCESSING...' : 'SAVE CONFIGURATION'}
-                                </button>
+                            <div className="space-y-6 pt-4 animate-fade-in-up">
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={uploading}
+                                        className="bg-primary text-black font-black py-4 px-8 rounded-xl text-sm tracking-[0.2em] shadow-[0_0_20px_rgba(0,255,255,0.4)] hover:shadow-[0_0_40px_rgba(0,255,255,0.6)] hover:scale-[1.02] transition-all duration-300 uppercase w-full md:w-auto"
+                                    >
+                                        {uploading ? 'PROCESSING...' : 'SAVE CONFIGURATION'}
+                                    </button>
+                                </div>
+
+                                {/* Danger Zone */}
+                                <div className="border border-red-500/30 rounded-2xl p-6 bg-red-500/5">
+                                    <h3 className="text-xs font-bold text-red-500 tracking-[0.2em] mb-3 uppercase flex items-center gap-2">
+                                        <FaTrash /> Danger Zone
+                                    </h3>
+                                    <p className="text-gray-500 text-xs mb-4">Permanently delete your account and purge all associated data (posts, comments, messages, squad membership, tournament enrollments). This action is irreversible.</p>
+                                    <button
+                                        onClick={async () => {
+                                            if (!window.confirm('⚠️ Are you absolutely sure? This will permanently delete your account and ALL your data. This cannot be undone.')) return;
+                                            if (!window.confirm('FINAL WARNING: Type "DELETE" mentally and click OK to proceed with account termination.')) return;
+                                            try {
+                                                await axios.delete('http://localhost:5000/api/users/profile', {
+                                                    headers: { Authorization: `Bearer ${token}` }
+                                                });
+                                                alert('Your account has been permanently deleted.');
+                                                logout();
+                                            } catch (err) {
+                                                alert(err.response?.data?.message || 'Failed to delete account');
+                                            }
+                                        }}
+                                        className="bg-red-500/20 text-red-400 border border-red-500/50 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                                    >
+                                        <FaTrash className="inline mr-2" /> Delete My Account
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>

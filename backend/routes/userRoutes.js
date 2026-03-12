@@ -8,13 +8,15 @@ const {
     acceptFriendRequest,
     declineFriendRequest,
     removeFriend,
-    getFriendsList
+    getFriendsList,
+    deleteOwnAccount
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.get('/', getUsers);
 router.get('/u/:username', getUserProfile);
 router.put('/profile', protect, updateUserProfile);
+router.delete('/profile', protect, deleteOwnAccount);
 router.get('/friends/list', protect, getFriendsList);
 
 router.put('/request/:id', protect, sendFriendRequest);
