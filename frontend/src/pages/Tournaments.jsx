@@ -12,24 +12,42 @@ const Tournaments = () => {
     const [error, setError] = useState('');
     const [showEnrolledModal, setShowEnrolledModal] = useState(false);
 
+    const [subscribed, setSubscribed] = useState(false);
+
     useEffect(() => {
         const fetchTournaments = async () => {
             try {
                 // Fetch public list (everyone can see this)
-                const publicRes = await axios.get('http://localhost:5000/api/tournaments/public');
-                setTournaments(publicRes.data);
+                try {
+                    const publicRes = await axios.get('http://localhost:5000/api/tournaments/public');
+                    setTournaments(publicRes.data);
+                } catch (err) {
+                    console.error("Public tournaments fetch failed:", err);
+                }
 
-                // Fetch enrolled list (if authenticated)
+                // Fetch enrolled list and subscription status (if authenticated)
                 if (token) {
-                    const enrolledRes = await axios.get('http://localhost:5000/api/tournaments/enrolled', {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    setEnrolledTournaments(enrolledRes.data);
+                    const headers = { Authorization: `Bearer ${token}` };
+                    
+                    try {
+                        const enrolledRes = await axios.get('http://localhost:5000/api/tournaments/enrolled', { headers });
+                        setEnrolledTournaments(enrolledRes.data);
+                    } catch (err) {
+                        console.error("Enrolled tournaments fetch failed:", err);
+                    }
+
+                    try {
+                        // Get subscription status from user profile
+                        const userRes = await axios.get('http://localhost:5000/api/users/profile', { headers });
+                        setSubscribed(!!userRes.data.tournamentEmailSubscribed);
+                    } catch (err) {
+                        console.error("User profile fetch failed:", err);
+                    }
                 }
 
                 setLoading(false);
             } catch (err) {
-                console.error(err);
+                console.error("Tournament overview initialization failed:", err);
                 setError('UNABLE TO ESTABLISH LINK WITH TOURNAMENT NETWORK');
                 setLoading(false);
             }
@@ -37,6 +55,17 @@ const Tournaments = () => {
 
         fetchTournaments();
     }, [token]);
+
+    const handleSubscribeToggle = async () => {
+        try {
+            const { data } = await axios.put('http://localhost:5000/api/users/tournament-subscribe', {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSubscribed(data.subscribed);
+        } catch (err) {
+            console.error('Failed to update subscription', err);
+        }
+    };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -71,6 +100,15 @@ const Tournaments = () => {
                     </div>
 
                     <div className="mt-6 md:mt-0 flex flex-col sm:flex-row items-center gap-4">
+                        {token && (
+                            <button
+                                onClick={handleSubscribeToggle}
+                                className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 border rounded-xl font-bold uppercase tracking-widest transition-all duration-300 ${subscribed ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-white/10 text-gray-400 hover:border-primary/50'}`}
+                            >
+                                <FaCalendarAlt className={subscribed ? 'text-primary' : 'text-gray-500'} />
+                                Email Alerts: {subscribed ? 'Active' : 'Muted'}
+                            </button>
+                        )}
                         {user && (
                             <button
                                 onClick={() => setShowEnrolledModal(true)}

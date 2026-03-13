@@ -11,7 +11,8 @@ const {
     getReportedPosts,
     adminDeletePost,
     getReportedComments,
-    adminDeleteComment
+    adminDeleteComment,
+    sendBroadcast
 } = require('../controllers/adminController');
 
 // All routes are protected + admin only
@@ -19,6 +20,9 @@ router.use(protect, admin);
 
 // Dashboard stats
 router.get('/stats', getAdminStats);
+
+// Broadcasts
+router.post('/broadcast', sendBroadcast);
 
 // User management
 router.get('/users', getAllUsers);

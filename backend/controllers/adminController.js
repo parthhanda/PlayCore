@@ -5,6 +5,7 @@ const Message = require('../models/Message');
 const Squad = require('../models/Squad');
 const Tournament = require('../models/Tournament');
 const cascadeDeleteUser = require('../utils/cascadeDeleteUser');
+const { sendNotification } = require('../utils/notificationHelper');
 
 // @desc    Get admin dashboard stats
 // @route   GET /api/admin/stats
@@ -235,6 +236,35 @@ const adminDeleteComment = async (req, res) => {
     }
 };
 
+// @desc    Send a global broadcast notification to all users
+// @route   POST /api/admin/broadcast
+// @access  Private (Admin only)
+const sendBroadcast = async (req, res) => {
+    try {
+        const { message, link } = req.body;
+        if (!message) return res.status(400).json({ message: 'Message is required' });
+
+        const users = await User.find({}).select('_id');
+        
+        // Use Promise.all for faster execution, though for very large user bases 
+        // this should be moved to a background worker.
+        await Promise.all(users.map(u => 
+            sendNotification({
+                recipient: u._id,
+                type: 'admin_broadcast',
+                message: `📢 ${message}`,
+                link: link || '',
+                sender: req.user.id
+            })
+        ));
+
+        res.json({ message: `Broadcast sent to ${users.length} users` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getAdminStats,
     getAllUsers,
@@ -245,5 +275,6 @@ module.exports = {
     getReportedPosts,
     adminDeletePost,
     getReportedComments,
-    adminDeleteComment
+    adminDeleteComment,
+    sendBroadcast
 };

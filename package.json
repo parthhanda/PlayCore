@@ -27,6 +27,8 @@
     "mongoose": "^8.0.3",
     "multer": "^2.0.2",
     "multer-gridfs-storage": "^5.0.2",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.2",
     "pdfkit": "^0.17.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

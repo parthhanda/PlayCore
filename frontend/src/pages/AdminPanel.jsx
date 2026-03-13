@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaUsers, FaNewspaper, FaComments, FaTrophy, FaShieldAlt, FaTrash, FaUserShield, FaSearch, FaFlag, FaExclamationTriangle, FaEnvelope, FaChartBar } from 'react-icons/fa';
+import { FaUsers, FaNewspaper, FaComments, FaTrophy, FaShieldAlt, FaTrash, FaUserShield, FaSearch, FaFlag, FaExclamationTriangle, FaEnvelope, FaChartBar, FaSatelliteDish, FaPaperPlane } from 'react-icons/fa';
 import AuthContext from '../context/AuthContext';
 
 const AdminPanel = () => {
@@ -14,6 +14,8 @@ const AdminPanel = () => {
     const [reportedPosts, setReportedPosts] = useState([]);
     const [reportedComments, setReportedComments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [broadcast, setBroadcast] = useState({ message: '', link: '' });
+    const [sending, setSending] = useState(false);
 
     const API = 'http://localhost:5000/api/admin';
     const headers = { Authorization: `Bearer ${token}` };
@@ -122,6 +124,22 @@ const AdminPanel = () => {
         fetchUsers(userSearch);
     };
 
+    const handleBroadcast = async (e) => {
+        e.preventDefault();
+        if (!broadcast.message) return;
+        setSending(true);
+        try {
+            await axios.post(`${API}/broadcast`, broadcast, { headers });
+            alert('BROADCAST TRANSMITTED TO ALL ACTIVE OPERATIVES');
+            setBroadcast({ message: '', link: '' });
+        } catch (err) {
+            console.error(err);
+            alert('TRANSMISSION FAILURE: Check network status');
+        } finally {
+            setSending(false);
+        }
+    };
+
     if (loading) return (
         <div className="min-h-screen bg-background flex items-center justify-center">
             <div className="text-red-500 font-display tracking-[0.5em] animate-pulse">INITIALIZING MCP...</div>
@@ -216,6 +234,67 @@ const AdminPanel = () => {
                                 <div className="text-3xl font-black font-display text-yellow-400">{stats.adminUsers}</div>
                                 <div className="text-[10px] text-gray-500 uppercase tracking-widest">With elevated privileges</div>
                             </div>
+                        </div>
+
+                        {/* Broadcast System Section */}
+                        <div className="mt-12 bg-black/40 border border-white/10 rounded-3xl p-8 backdrop-blur-md">
+                            <div className="flex items-center gap-4 mb-8">
+                                <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center border border-primary/30">
+                                    <FaSatelliteDish className="text-primary text-xl" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold uppercase tracking-widest text-white">Global Broadcast System</h3>
+                                    <p className="text-xs text-gray-400">Real-time tactical alerts for all site users</p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleBroadcast} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3">Transmission Payload</label>
+                                        <textarea
+                                            value={broadcast.message}
+                                            onChange={(e) => setBroadcast({ ...broadcast, message: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl p-4 text-white focus:border-primary/50 focus:outline-none h-40 resize-none placeholder:text-gray-800 font-mono text-sm leading-relaxed"
+                                            placeholder="ENTER BROADCAST MESSAGE..."
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col justify-between">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3">Optional Link Path</label>
+                                        <input
+                                            type="text"
+                                            value={broadcast.link}
+                                            onChange={(e) => setBroadcast({ ...broadcast, link: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-white focus:border-primary/50 focus:outline-none placeholder:text-gray-800 font-mono text-sm"
+                                            placeholder="e.g. /tournaments/current"
+                                        />
+                                        <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                                            <p className="text-[10px] text-primary/80 leading-relaxed">
+                                                <span className="font-bold uppercase tracking-widest block mb-1">Warning:</span>
+                                                Global broadcasts override standard notification priority and trigger immediate socket events for all connected operatives.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <button
+                                        type="submit"
+                                        disabled={sending || !broadcast.message}
+                                        className="mt-6 w-full h-16 bg-primary text-black font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-white hover:shadow-[0_0_40px_rgba(0,255,255,0.4)] disabled:opacity-30 disabled:hover:shadow-none transition-all duration-500 flex items-center justify-center gap-4 group"
+                                    >
+                                        {sending ? (
+                                            <div className="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+                                        ) : (
+                                            <>
+                                                <FaPaperPlane className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
+                                                Initiate Global Broadcast
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 )}

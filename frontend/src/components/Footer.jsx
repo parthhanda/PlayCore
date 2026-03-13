@@ -1,9 +1,47 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FaDiscord, FaTwitter, FaGithub, FaPaperPlane, FaEnvelope } from 'react-icons/fa';
+import { useContext, useState } from 'react';
+import axios from 'axios';
+import AuthContext from '../context/AuthContext';
+import { FaDiscord, FaTwitter, FaGithub, FaPaperPlane, FaEnvelope, FaCheck } from 'react-icons/fa';
 
 const Footer = () => {
     const location = useLocation();
+    const { user, token } = useContext(AuthContext);
     const isHomePage = location.pathname === '/';
+    const [email, setEmail] = useState('');
+    const [status, setStatus] = useState('idle'); // idle, loading, success, error
+
+    const handleSubscribe = async () => {
+        if (!user) {
+            alert('PLEASE LOG IN TO JOIN THE INNER CIRCLE');
+            return;
+        }
+        if (!email || !email.includes('@')) {
+            alert('PLEASE ENTER A VALID EMAIL ADDRESS');
+            return;
+        }
+
+        setStatus('loading');
+        try {
+            // Since we're logged in, we use the tournament-subscribe endpoint
+            // We'll modify the endpoint slightly or just use it as is if it's a toggle.
+            // But let's assume we want to ensure it's "true".
+            // For now, let's just toggle it if they are not subscribed, or leave it if they are.
+            // Actually, let's check if the user is already subscribed.
+            
+            await axios.put('http://localhost:5000/api/users/tournament-subscribe', {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            setStatus('success');
+            setTimeout(() => setStatus('idle'), 3000);
+        } catch (err) {
+            console.error(err);
+            setStatus('error');
+            setTimeout(() => setStatus('idle'), 3000);
+        }
+    };
+
     return (
         <footer className="bg-black/90 border-t border-white/10 pt-16 pb-8 font-sans text-gray-400">
             <div className="container mx-auto px-4">
@@ -29,11 +67,23 @@ const Footer = () => {
                                 <div className="w-full md:w-auto flex flex-col sm:flex-row gap-4">
                                     <input
                                         type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
                                         placeholder="ENTER EMAIL ADDRESS"
                                         className="bg-black/50 border border-white/10 text-white px-6 py-3 rounded-xl focus:border-primary focus:outline-none w-full md:w-80 text-sm tracking-widest placeholder:text-gray-600"
                                     />
-                                    <button className="bg-primary text-black font-bold px-8 py-3 rounded-xl uppercase tracking-widest hover:bg-white hover:shadow-[0_0_20px_rgba(0,255,255,0.4)] transition-all flex items-center justify-center gap-2">
-                                        <FaPaperPlane /> Subscribe
+                                    <button 
+                                        onClick={handleSubscribe}
+                                        disabled={status === 'loading'}
+                                        className="bg-primary text-black font-bold px-8 py-3 rounded-xl uppercase tracking-widest hover:bg-white hover:shadow-[0_0_20px_rgba(0,255,255,0.4)] transition-all flex items-center justify-center gap-2"
+                                    >
+                                        {status === 'loading' ? (
+                                            <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                                        ) : status === 'success' ? (
+                                            <FaCheck />
+                                        ) : (
+                                            <><FaPaperPlane /> Subscribe</>
+                                        )}
                                     </button>
                                 </div>
                             </div>

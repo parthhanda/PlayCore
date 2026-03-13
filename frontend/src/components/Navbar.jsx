@@ -3,6 +3,7 @@ import { useContext, useState } from 'react';
 import AuthContext from '../context/AuthContext';
 import { FaBars, FaTimes, FaUsers, FaTrophy, FaShieldAlt, FaGamepad } from 'react-icons/fa';
 import { getAvatarUrl } from '../utils/avatarUtils';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
     const { user, logout } = useContext(AuthContext);
@@ -66,6 +67,7 @@ const Navbar = () => {
                     {user ? (
                         <>
                             <div className="h-6 w-px bg-white/10 mx-2"></div>
+                            <NotificationBell />
                             <Link to={`/u/${user.username}`} className="text-neon-green font-medium hover:text-white transition flex items-center gap-3 group">
                                 <div className="text-right hidden lg:block">
                                     <div className="text-xs text-gray-400 group-hover:text-primary transition uppercase tracking-wider">Operative</div>

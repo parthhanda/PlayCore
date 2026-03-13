@@ -2,6 +2,7 @@ const User = require('../models/User');
 const fs = require('fs');
 const path = require('path');
 const cascadeDeleteUser = require('../utils/cascadeDeleteUser');
+const { sendNotification } = require('../utils/notificationHelper');
 
 // @desc    Get user profile by username
 // @route   GET /api/users/u/:username
@@ -39,6 +40,23 @@ const getUsers = async (req, res) => {
             .limit(20);
 
         res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Get logged in user profile
+// @route   GET /api/users/profile
+// @access  Private
+const getMyProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
@@ -122,6 +140,15 @@ const sendFriendRequest = async (req, res) => {
         await user.save();
         await targetUser.save();
 
+        // Notify target user
+        await sendNotification({
+            recipient: targetUser._id,
+            type: 'friend_request',
+            message: `${user.username} sent you a friend request`,
+            link: `/u/${user.username}`,
+            sender: user._id
+        });
+
         res.json(user.sentRequests);
     } catch (error) {
         console.error(error);
@@ -151,6 +178,15 @@ const acceptFriendRequest = async (req, res) => {
 
         await user.save();
         await requester.save();
+
+        // Notify requester that their request was accepted
+        await sendNotification({
+            recipient: requester._id,
+            type: 'friend_accept',
+            message: `${user.username} accepted your friend request`,
+            link: `/u/${user.username}`,
+            sender: user._id
+        });
 
         await user.populate('friends', 'username avatar');
 
@@ -245,8 +281,27 @@ const deleteOwnAccount = async (req, res) => {
     }
 };
 
+// @desc    Toggle tournament email subscription
+// @route   PUT /api/users/tournament-subscribe
+// @access  Private
+const toggleTournamentSubscription = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.tournamentEmailSubscribed = !user.tournamentEmailSubscribed;
+        await user.save();
+
+        res.json({ subscribed: user.tournamentEmailSubscribed });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getUserProfile,
+    getMyProfile,
     updateUserProfile,
     getUsers,
     getFriendsList,
@@ -254,5 +309,6 @@ module.exports = {
     acceptFriendRequest,
     declineFriendRequest,
     removeFriend,
-    deleteOwnAccount
+    deleteOwnAccount,
+    toggleTournamentSubscription
 };

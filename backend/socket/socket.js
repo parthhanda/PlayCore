@@ -20,6 +20,7 @@ const initSocket = (server) => {
         const userId = socket.handshake.query.userId;
         if (userId) {
             onlineUsers.set(userId, socket.id);
+            socket.join(`user_${userId}`); // Join user-specific room for targeted notifications
             io.emit('online_users', Array.from(onlineUsers.keys()));
             console.log(`User ${userId} came online.`);
         }

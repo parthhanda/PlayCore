@@ -1,6 +1,8 @@
 const Tournament = require('../models/Tournament');
 const Match = require('../models/Match');
 const User = require('../models/User');
+const { sendEmail, tournamentListedEmail, enrollmentConfirmEmail } = require('../utils/emailService');
+const { sendNotification } = require('../utils/notificationHelper');
 
 // --- Pre-existing Routes (getPublicTournaments, getTournamentById, createTournament, enrollTournament) ---
 // Note: We are doing a full replacement to add the startTournament Logic in a robust way.
@@ -62,6 +64,26 @@ const createTournament = async (req, res) => {
             title, description, game, rules, host: req.user.id, startDate, endDate, maxParticipants, type, status: 'registration'
         });
         const createdTournament = await tournament.save();
+
+        // Email all subscribed users about the new tournament
+        try {
+            const subscribers = await User.find({ tournamentEmailSubscribed: true }).select('email username');
+            const emailData = tournamentListedEmail(createdTournament);
+            for (const sub of subscribers) {
+                await sendEmail(sub.email, emailData.subject, emailData.html);
+                await sendNotification({
+                    recipient: sub._id,
+                    type: 'tournament_new',
+                    message: `🏆 New tournament listed: "${title}"`,
+                    link: `/tournaments/${createdTournament._id}`,
+                    sender: req.user.id
+                });
+            }
+            console.log(`[TOURNAMENT] Emailed ${subscribers.length} subscribers about "${title}"`);
+        } catch (emailErr) {
+            console.error('[TOURNAMENT] Email notification error:', emailErr.message);
+        }
+
         res.status(201).json(createdTournament);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
@@ -82,6 +104,17 @@ const enrollTournament = async (req, res) => {
 
         tournament.enrolledPlayers.push({ user: req.user.id, inGameUid, inGameName, contactNumber });
         await tournament.save();
+
+        // Send enrollment confirmation email
+        try {
+            const enrolledUser = await User.findById(req.user.id).select('email username');
+            if (enrolledUser) {
+                const emailData = enrollmentConfirmEmail(tournament, enrolledUser.username);
+                await sendEmail(enrolledUser.email, emailData.subject, emailData.html);
+            }
+        } catch (emailErr) {
+            console.error('[TOURNAMENT] Enrollment email error:', emailErr.message);
+        }
 
         const updatedTournament = await Tournament.findById(req.params.id)
             .populate('host', 'username avatar')

@@ -79,7 +79,12 @@ const TournamentSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Match'
         }
-    ]
+    ],
+    // Flag to prevent duplicate reminder emails
+    reminderSent: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true
 });

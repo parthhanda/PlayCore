@@ -43,6 +43,13 @@ app.use('/api/posts', require('./routes/postRoutes'));
 app.use('/api/comments', require('./routes/commentRoutes'));
 app.use('/api/upload', require('./routes/gridUploadRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+
+// Initialize email service and tournament reminder cron
+const { initTransporter } = require('./utils/emailService');
+const { startTournamentReminders } = require('./utils/tournamentReminder');
+initTransporter().then(() => console.log('[EMAIL] Transporter ready'));
+startTournamentReminders();
 
 // Serve static assets
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
