@@ -71,6 +71,7 @@ const loginUser = async (req, res) => {
             // Populate friends and requests before sending
             await user.populate('friends', 'username avatar');
             await user.populate('friendRequests.from', 'username avatar');
+            await user.populate('sentRequests.to', 'username avatar');
 
             res.json({
                 _id: user.id,
@@ -99,7 +100,8 @@ const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.id)
             .populate('friends', 'username avatar')
-            .populate('friendRequests.from', 'username avatar');
+            .populate('friendRequests.from', 'username avatar')
+            .populate('sentRequests.to', 'username avatar');
         res.status(200).json(user);
     } catch (error) {
         console.error(error);

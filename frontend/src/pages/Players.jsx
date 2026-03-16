@@ -12,7 +12,7 @@ const Players = () => {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('global'); // global, allies, comms
-    const [requests, setRequests] = useState([]);
+    const [requests, setRequests] = useState({ incoming: [], outgoing: [] });
 
     // Fetch Users
     useEffect(() => {
@@ -41,7 +41,10 @@ const Players = () => {
             const { data } = await axios.get('http://localhost:5000/api/auth/me', {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setRequests(data.friendRequests || []);
+            setRequests({
+                incoming: data.friendRequests || [],
+                outgoing: data.sentRequests || []
+            });
             // Also update users list for Allies tab if needed, but we filter from 'users' state currently.
             // If we want 'Allies' to show full details, we should probably use the populated friends from getMe
             // instead of filtering the global list (which relies on 'users' being populated).
@@ -82,8 +85,7 @@ const Players = () => {
             await axios.put(`http://localhost:5000/api/users/accept/${id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // Refresh
-            window.location.reload();
+            fetchMyRequests();
         } catch (err) {
             console.error(err);
         }
@@ -94,8 +96,7 @@ const Players = () => {
             await axios.put(`http://localhost:5000/api/users/decline/${id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // Refresh
-            window.location.reload();
+            fetchMyRequests();
         } catch (err) {
             console.error(err);
         }
@@ -159,36 +160,69 @@ const Players = () => {
 
                 {/* Comms Tab Content */}
                 {activeTab === 'comms' && (
-                    <div className="max-w-3xl mx-auto">
-                        {loading ? (
-                            <div className="text-center text-primary font-display tracking-[0.5em] animate-pulse">ESTABLISHING UPLINK...</div>
-                        ) : requests.length > 0 ? (
-                            <div className="space-y-4">
-                                {requests.map((req, idx) => (
-                                    <div key={idx} className="bg-black/40 border border-orange-500/30 rounded-xl p-6 flex items-center justify-between hover:border-orange-500/80 transition-all shadow-[0_0_20px_rgba(255,165,0,0.1)]">
+                    <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Incoming Transmissions */}
+                        <div className="space-y-4">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-500 mb-6 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span> Incoming Transmissions
+                            </h2>
+                            {loading ? (
+                                <div className="text-center text-primary font-display tracking-[0.2em] animate-pulse">ESTABLISHING UPLINK...</div>
+                            ) : requests.incoming.length > 0 ? (
+                                requests.incoming.map((req, idx) => (
+                                    <div key={idx} className="bg-black/40 border border-orange-500/30 rounded-xl p-4 flex flex-col gap-4 hover:border-orange-500/80 transition-all shadow-[0_0_20px_rgba(255,165,0,0.1)]">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center border border-white/10">
-                                                <FaSatelliteDish className="text-orange-500" />
+                                            <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center border border-white/10 overflow-hidden">
+                                                <img src={getAvatarUrl(req.from?.avatar)} alt="" className="w-full h-full object-cover" />
                                             </div>
                                             <div>
-                                                <h3 className="text-white font-bold font-display uppercase tracking-wide">Incoming Transmission</h3>
-                                                <p className="text-gray-500 text-xs tracking-wider">Operative: {req.from?.username || 'Unknown'}</p>
+                                                <h3 className="text-white font-bold font-display uppercase tracking-wide text-xs">{req.from?.username || 'Unknown'}</h3>
+                                                <p className="text-gray-500 text-[9px] tracking-wider uppercase">Connection Request</p>
                                             </div>
                                         </div>
-                                        <div className="flex gap-3">
-                                            <button onClick={() => handleAccept(req.from._id)} className="bg-green-500 text-black px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-green-400 transition flex items-center gap-2">
+                                        <div className="flex gap-2">
+                                            <button onClick={() => handleAccept(req.from._id)} className="flex-1 bg-green-500 text-black py-2 rounded-lg font-bold text-[10px] uppercase hover:bg-green-400 transition flex items-center justify-center gap-2">
                                                 <FaCheck /> Accept
                                             </button>
-                                            <button onClick={() => handleDecline(req.from._id)} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-500 transition flex items-center gap-2">
+                                            <button onClick={() => handleDecline(req.from._id)} className="flex-1 bg-red-600 text-white py-2 rounded-lg font-bold text-[10px] uppercase hover:bg-red-500 transition flex items-center justify-center gap-2">
                                                 <FaTimes /> Decline
                                             </button>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center text-gray-500 font-display tracking-widest mt-20">NO INCOMING TRANSMISSIONS</div>
-                        )}
+                                ))
+                            ) : (
+                                <div className="text-center text-gray-700 font-display tracking-widest py-10 bg-black/20 border border-dashed border-white/5 rounded-xl uppercase text-[10px]">No Incoming</div>
+                            )}
+                        </div>
+
+                        {/* Sent Signals */}
+                        <div className="space-y-4">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span> Sent Signals
+                            </h2>
+                            {loading ? (
+                                <div className="text-center text-primary font-display tracking-[0.2em] animate-pulse">ESTABLISHING UPLINK...</div>
+                            ) : requests.outgoing.length > 0 ? (
+                                requests.outgoing.map((req, idx) => (
+                                    <div key={idx} className="bg-black/40 border border-primary/30 rounded-xl p-4 flex flex-col gap-4 hover:border-primary/80 transition-all shadow-[0_0_20px_rgba(0,255,255,0.05)]">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center border border-white/10 overflow-hidden">
+                                                <img src={getAvatarUrl(req.to?.avatar)} alt="" className="w-full h-full object-cover" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-white font-bold font-display uppercase tracking-wide text-xs">{req.to?.username || 'Unknown'}</h3>
+                                                <p className="text-gray-500 text-[9px] tracking-wider uppercase">Signal Pending</p>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => handleDecline(req.to._id)} className="w-full bg-white/5 text-gray-400 py-2 rounded-lg font-bold text-[10px] uppercase hover:bg-red-500/20 hover:text-red-500 transition flex items-center justify-center gap-2 border border-white/10">
+                                            <FaTimes /> Cancel Request
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center text-gray-700 font-display tracking-widest py-10 bg-black/20 border border-dashed border-white/5 rounded-xl uppercase text-[10px]">No Active Signals</div>
+                            )}
+                        </div>
                     </div>
                 )}
 

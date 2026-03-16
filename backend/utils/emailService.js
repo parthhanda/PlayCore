@@ -12,16 +12,20 @@ const initTransporter = async () => {
 
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
         // Production / custom SMTP
+        const port = parseInt(process.env.SMTP_PORT) || 587;
+        // secure: true for port 465, false for 587 (typically)
+        const secure = process.env.SMTP_SECURE === 'true' || port === 465;
+
         transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
-            port: parseInt(process.env.SMTP_PORT) || 587,
-            secure: false,
+            port: port,
+            secure: secure,
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASS
             }
         });
-        console.log(`[EMAIL] Using custom SMTP: ${process.env.SMTP_HOST}`);
+        console.log(`[EMAIL] Using custom SMTP: ${process.env.SMTP_HOST} (Port: ${port}, Secure: ${secure})`);
     } else {
         // Dev: create Ethereal test account
         etherealAccount = await nodemailer.createTestAccount();
