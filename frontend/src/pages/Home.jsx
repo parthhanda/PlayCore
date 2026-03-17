@@ -2,7 +2,10 @@ import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import heroBg from '../assets/hero-bg.jpg';
-import { FaGamepad, FaTrophy, FaUsers, FaArrowRight, FaPlay, FaMicrochip } from 'react-icons/fa';
+import { 
+    FaGamepad, FaTrophy, FaUsers, FaArrowRight, FaPlay, FaMicrochip,
+    FaShieldAlt, FaSatelliteDish, FaUserSecret, FaRegBell, FaNewspaper, FaStream
+} from 'react-icons/fa';
 
 const Home = () => {
     const { user } = useContext(AuthContext);
@@ -184,6 +187,94 @@ const Home = () => {
                                 <Link to="/directory" className="text-accent text-xs font-bold tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
                                     Access Module <FaArrowRight />
                                 </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Platform Services Section */}
+            <section className="py-32 bg-black/60 relative overflow-hidden">
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-[120px] pointer-events-none"></div>
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="flex flex-col md:flex-row items-end justify-between mb-20 gap-6">
+                        <div className="max-w-2xl">
+                            <h2 className="text-3xl md:text-5xl font-black text-white font-display mb-4 uppercase tracking-tighter">
+                                Platform <span className="text-primary">Ecosystem</span>
+                            </h2>
+                            <p className="text-gray-400 text-sm md:text-base tracking-wide uppercase font-bold opacity-60">
+                                Integrated services designed for the next generation of competitive gaming.
+                            </p>
+                        </div>
+                        <div className="h-px flex-grow bg-gradient-to-r from-primary/50 to-transparent hidden md:block mb-4"></div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-12">
+                        {/* Service 1 */}
+                        <div className="flex gap-6 group">
+                            <div className="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-primary group-hover:bg-primary group-hover:text-black transition-all duration-500 shadow-[0_0_20px_rgba(0,255,255,0.1)]">
+                                <FaShieldAlt />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-white mb-2 uppercase tracking-wider font-display group-hover:text-primary transition-colors">Tournament Engine</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Automated bracket generation, real-time result verification, and instant reward distribution protocols.</p>
+                            </div>
+                        </div>
+
+                        {/* Service 2 */}
+                        <div className="flex gap-6 group">
+                            <div className="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-secondary group-hover:bg-secondary group-hover:text-black transition-all duration-500 shadow-[0_0_20px_rgba(255,0,255,0.1)]">
+                                <FaStream />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-white mb-2 uppercase tracking-wider font-display group-hover:text-secondary transition-colors">Squad Command</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Advanced faction management, recruitment pipelines, and coordinated team battle coordination.</p>
+                            </div>
+                        </div>
+
+                        {/* Service 3 */}
+                        <div className="flex gap-6 group">
+                            <div className="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-accent group-hover:bg-accent group-hover:text-black transition-all duration-500 shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                                <FaUserSecret />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-white mb-2 uppercase tracking-wider font-display group-hover:text-accent transition-colors">Operative Intel</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Deep-dive player analytics, performance metrics, and global reputation tracking systems.</p>
+                            </div>
+                        </div>
+
+                        {/* Service 4 */}
+                        <div className="flex gap-6 group">
+                            <div className="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-blue-500 group-hover:bg-blue-500 group-hover:text-black transition-all duration-500">
+                                <FaSatelliteDish />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-white mb-2 uppercase tracking-wider font-display group-hover:text-blue-500 transition-colors">Instant Comms</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Low-latency global transmission channels and encrypted private messaging interfaces.</p>
+                            </div>
+                        </div>
+
+                        {/* Service 5 */}
+                        <div className="flex gap-6 group">
+                            <div className="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-yellow-500 group-hover:bg-yellow-500 group-hover:text-black transition-all duration-500">
+                                <FaRegBell />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-white mb-2 uppercase tracking-wider font-display group-hover:text-yellow-500 transition-colors">Tactical Alerts</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Real-time engagement notifications and high-priority mission reminders via secure relay.</p>
+                            </div>
+                        </div>
+
+                        {/* Service 6 */}
+                        <div className="flex gap-6 group">
+                            <div className="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-orange-500 group-hover:bg-orange-500 group-hover:text-black transition-all duration-500">
+                                <FaNewspaper />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-white mb-2 uppercase tracking-wider font-display group-hover:text-orange-500 transition-colors">News Desk</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Direct feeds from the frontlines, patch intelligence, and community update briefings.</p>
                             </div>
                         </div>
                     </div>

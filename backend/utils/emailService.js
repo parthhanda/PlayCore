@@ -152,10 +152,36 @@ const tournamentReminderEmail = (tournament) => {
     };
 };
 
+const contactQueryEmail = (name, email, subject, message) => {
+    return {
+        subject: `📩 Contact Query: ${subject}`,
+        html: `
+        <div style="background:#0a0a0a;color:#fff;font-family:Arial,sans-serif;padding:40px;max-width:600px;margin:0 auto;border:1px solid #1a1a1a;border-radius:16px;">
+            <div style="text-align:center;margin-bottom:30px;">
+                <h1 style="font-size:28px;margin:0;letter-spacing:2px;">PLAY<span style="color:#00ffff;">CORE</span></h1>
+                <div style="width:60px;height:3px;background:linear-gradient(90deg,#00ffff,#ff00ff);margin:10px auto;border-radius:2px;"></div>
+            </div>
+            <div style="background:#111;border:1px solid #222;border-radius:12px;padding:30px;">
+                <h2 style="color:#00ffff;font-size:20px;margin:0 0 20px 0;text-transform:uppercase;">📩 New Query Received</h2>
+                <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+                    <tr><td style="color:#888;padding:6px 0;font-size:13px;width:100px;">FROM</td><td style="color:#fff;font-weight:bold;padding:6px 0;">${name}</td></tr>
+                    <tr><td style="color:#888;padding:6px 0;font-size:13px;">EMAIL</td><td style="color:#fff;font-weight:bold;padding:6px 0;">${email}</td></tr>
+                    <tr><td style="color:#888;padding:6px 0;font-size:13px;">SUBJECT</td><td style="color:#fff;font-weight:bold;padding:6px 0;">${subject}</td></tr>
+                </table>
+                <div style="background:#1a1a1a;padding:20px;border-radius:8px;border-left:4px solid #00ffff;color:#ccc;font-size:14px;line-height:1.6;">
+                    ${message.replace(/\n/g, '<br>')}
+                </div>
+            </div>
+            <p style="color:#444;font-size:11px;text-align:center;margin-top:30px;">Transmission received via PlayCore Intelligence Terminal.</p>
+        </div>`
+    };
+};
+
 module.exports = {
     initTransporter,
     sendEmail,
     tournamentListedEmail,
     enrollmentConfirmEmail,
-    tournamentReminderEmail
+    tournamentReminderEmail,
+    contactQueryEmail
 };

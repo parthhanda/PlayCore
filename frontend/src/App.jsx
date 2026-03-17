@@ -16,6 +16,7 @@ import SquadProfile from './pages/SquadProfile';
 import Tournaments from './pages/Tournaments';
 import CreateTournament from './pages/CreateTournament';
 import TournamentDetail from './pages/TournamentDetail';
+import Contact from './pages/Contact';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/tournaments" element={<Tournaments />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:slug" element={<PostDetail />} />
+                <Route path="/contact" element={<Contact />} />
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>

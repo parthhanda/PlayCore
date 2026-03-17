@@ -44,6 +44,7 @@ app.use('/api/comments', require('./routes/commentRoutes'));
 app.use('/api/upload', require('./routes/gridUploadRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/contact', require('./routes/contactRoutes'));
 
 // Initialize email service and tournament reminder cron
 const { initTransporter } = require('./utils/emailService');
