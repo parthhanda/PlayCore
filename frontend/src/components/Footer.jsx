@@ -106,7 +106,7 @@ const Footer = () => {
                                     <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-all duration-300">
                                         <FaTwitter />
                                     </a>
-                                    <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-all duration-300">
+                                    <a href="https://github.com/parthhanda/PlayCore" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-all duration-300">
                                         <FaGithub />
                                     </a>
                                 </div>
@@ -128,9 +128,7 @@ const Footer = () => {
                                 <h4 className="text-white font-bold uppercase tracking-widest mb-6 border-l-4 border-secondary pl-4">Support</h4>
                                 <ul className="space-y-3 text-sm">
                                     <li><Link to="/about" className="hover:text-secondary transition-colors">About Us</Link></li>
-                                    <li><Link to="/contact" className="hover:text-secondary transition-colors">Contact Intelligence</Link></li>
-                                    <li><a href="#" className="hover:text-secondary transition-colors">System Status</a></li>
-                                    <li><a href="#" className="hover:text-secondary transition-colors">Knowledge Base</a></li>
+                                <li><Link to="/contact" className="hover:text-secondary transition-colors">Contact Intelligence</Link></li>
                                 </ul>
                             </div>
 
@@ -138,10 +136,10 @@ const Footer = () => {
                             <div>
                                 <h4 className="text-white font-bold uppercase tracking-widest mb-6 border-l-4 border-accent pl-4">Legal Protocol</h4>
                                 <ul className="space-y-3 text-sm">
-                                    <li><a href="#" className="hover:text-accent transition-colors">Privacy Policy</a></li>
-                                    <li><a href="#" className="hover:text-accent transition-colors">Terms of Service</a></li>
-                                    <li><a href="#" className="hover:text-accent transition-colors">Cookie Policy</a></li>
-                                    <li><a href="#" className="hover:text-accent transition-colors">Code of Conduct</a></li>
+                                    <li><Link to="/legal#privacy" className="hover:text-accent transition-colors">Privacy Policy</Link></li>
+                                    <li><Link to="/legal#terms" className="hover:text-accent transition-colors">Terms of Service</Link></li>
+                                    <li><Link to="/legal#cookies" className="hover:text-accent transition-colors">Cookie Policy</Link></li>
+                                    <li><Link to="/legal#conduct" className="hover:text-accent transition-colors">Code of Conduct</Link></li>
                                 </ul>
                             </div>
                         </div>
