@@ -26,7 +26,7 @@ const Players = () => {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/users?search=${search}`);
+            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users?search=${search}`);
             setUsers(data);
         } catch (err) {
             console.error(err);
@@ -38,7 +38,7 @@ const Players = () => {
     const fetchMyRequests = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('http://localhost:5000/api/auth/me', {
+            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/me`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setRequests({
@@ -82,7 +82,7 @@ const Players = () => {
 
     const handleAccept = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/users/accept/${id}`, {}, {
+            await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/accept/${id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchMyRequests();
@@ -93,7 +93,7 @@ const Players = () => {
 
     const handleDecline = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/users/decline/${id}`, {}, {
+            await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/decline/${id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchMyRequests();

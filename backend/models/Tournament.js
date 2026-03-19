@@ -12,7 +12,8 @@ const TournamentSchema = new mongoose.Schema({
     },
     game: {
         type: String,
-        required: true
+        required: true,
+        index: true
     },
     rules: {
         type: String
@@ -28,15 +29,18 @@ const TournamentSchema = new mongoose.Schema({
     },
     startDate: {
         type: Date,
-        required: true
+        required: true,
+        index: true
     },
     endDate: {
-        type: Date
+        type: Date,
+        index: true
     },
     status: {
         type: String,
         enum: ['registration', 'in_progress', 'completed', 'cancelled'],
-        default: 'registration'
+        default: 'registration',
+        index: true
     },
     type: {
         type: String,

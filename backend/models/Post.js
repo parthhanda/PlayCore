@@ -53,6 +53,7 @@ const postSchema = new mongoose.Schema({
 
 // Create index on slug for fast lookups
 postSchema.index({ slug: 1 });
+postSchema.index({ createdAt: -1 }); // Index for feed sorting
 
 const Post = mongoose.model('Post', postSchema);
 

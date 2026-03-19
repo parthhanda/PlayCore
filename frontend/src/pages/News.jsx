@@ -16,7 +16,7 @@ const News = () => {
 
     const fetchPosts = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/posts');
+            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/posts`);
             setPosts(data.posts);
         } catch (error) {
             console.error('Error fetching intel:', error);
@@ -66,7 +66,7 @@ const News = () => {
                                 <div className="h-48 bg-gray-900 relative overflow-hidden">
                                     {post.coverImage ? (
                                         <img 
-                                            src={`http://localhost:5000${post.coverImage}`} 
+                                            src={`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${post.coverImage}`} 
                                             alt={post.title} 
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                                         />

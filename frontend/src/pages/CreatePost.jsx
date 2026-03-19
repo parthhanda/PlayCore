@@ -39,7 +39,7 @@ const CreatePost = () => {
         setUploading(true);
 
         try {
-            const { data } = await axios.post('http://localhost:5000/api/upload/gridfs', formData, {
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload/gridfs`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
@@ -75,7 +75,7 @@ const CreatePost = () => {
             formData.append('image', file);
 
             try {
-                const { data } = await axios.post('http://localhost:5000/api/upload/gridfs', formData, {
+                const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload/gridfs`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `Bearer ${token}`
@@ -85,7 +85,7 @@ const CreatePost = () => {
                 // Insert the returned image URL directly into the editor
                 const quill = quillRef.current.getEditor();
                 const range = quill.getSelection(true);
-                quill.insertEmbed(range.index, 'image', `http://localhost:5000${data.image}`);
+                quill.insertEmbed(range.index, 'image', `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${data.image}`);
                 quill.setSelection(range.index + 1);
             } catch (err) {
                 console.error('Image upload failed', err);
@@ -134,7 +134,7 @@ const CreatePost = () => {
         try {
             const tagsArray = tags.split(',').map(t => t.trim()).filter(t => t);
             
-            await axios.post('http://localhost:5000/api/posts', {
+            await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/posts`, {
                 title,
                 content,
                 tags: tagsArray,
@@ -210,7 +210,7 @@ const CreatePost = () => {
                                 <label className="block text-xs uppercase font-bold text-gray-400 tracking-wider mb-2">Cover Image (Max 10MB)</label>
                                 <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-white/5 aspect-video flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
                                     {coverImage ? (
-                                        <img src={`http://localhost:5000${coverImage}`} alt="Cover" className="w-full h-full object-cover" />
+                                        <img src={`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${coverImage}`} alt="Cover" className="w-full h-full object-cover" />
                                     ) : (
                                         <span className="text-gray-600 font-bold uppercase text-xs">No Signal</span>
                                     )}

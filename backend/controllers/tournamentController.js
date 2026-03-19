@@ -21,16 +21,17 @@ const getPublicTournaments = async (req, res) => {
         })
             .populate('host', 'username avatar')
             .select('title game startDate endDate status maxParticipants enrolledPlayers coverImage type')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .lean();
 
         const tournaments = tournamentsDb.map(t => {
-            const tObj = t.toObject ? t.toObject() : t;
-            if (tObj.endDate && new Date(tObj.endDate) < now && tObj.status !== 'completed') {
-                tObj.status = 'completed';
+            if (t.endDate && new Date(t.endDate) < now && t.status !== 'completed') {
+                t.status = 'completed';
             }
-            return tObj;
+            return t;
         });
 
+        res.set('Cache-Control', 'public, max-age=60');
         res.json(tournaments);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });

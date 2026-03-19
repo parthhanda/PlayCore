@@ -16,7 +16,7 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         if (user) {
-            const newSocket = io('http://localhost:5000', {
+            const newSocket = io(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}`, {
                 query: { userId: user._id },
                 transports: ['websocket']
             });

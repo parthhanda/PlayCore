@@ -66,7 +66,7 @@ const Profile = () => {
                 }
             }
 
-            const { data } = await axios.get(`http://localhost:5000/api/users/u/${usernameToFetch}`);
+            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/u/${usernameToFetch}`);
             setProfileData({
                 ...data,
                 socialLinks: data.socialLinks || { discord: '', twitter: '', instagram: '', steam: '', twitch: '' },
@@ -100,7 +100,7 @@ const Profile = () => {
         formData.append('image', imageFile);
         try {
             setUploading(true);
-            const { data } = await axios.post('http://localhost:5000/api/upload', formData, {
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
@@ -135,7 +135,7 @@ const Profile = () => {
         }
 
         try {
-            const { data } = await axios.put('http://localhost:5000/api/users/profile', {
+            const { data } = await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/profile`, {
                 ...profileData,
                 avatar: avatarUrl
             }, {
@@ -208,7 +208,7 @@ const Profile = () => {
 
     const handleConnect = async () => {
         try {
-            await axios.put(`http://localhost:5000/api/users/request/${profileData._id}`, {}, {
+            await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/request/${profileData._id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage('REQUEST TRANSMITTED');
@@ -221,7 +221,7 @@ const Profile = () => {
 
     const handleAccept = async () => {
         try {
-            await axios.put(`http://localhost:5000/api/users/accept/${profileData._id}`, {}, {
+            await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/accept/${profileData._id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage('CONNECTION ESTABLISHED');
@@ -235,7 +235,7 @@ const Profile = () => {
     const handleRemove = async () => {
         if (!window.confirm('Are you sure you want to sever this connection?')) return;
         try {
-            await axios.put(`http://localhost:5000/api/users/remove/${profileData._id}`, {}, {
+            await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/remove/${profileData._id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage('CONNECTION SEVERED');
@@ -604,7 +604,7 @@ const Profile = () => {
                                             if (!window.confirm('⚠️ Are you absolutely sure? This will permanently delete your account and ALL your data. This cannot be undone.')) return;
                                             if (!window.confirm('FINAL WARNING: Type "DELETE" mentally and click OK to proceed with account termination.')) return;
                                             try {
-                                                await axios.delete('http://localhost:5000/api/users/profile', {
+                                                await axios.delete(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/profile`, {
                                                     headers: { Authorization: `Bearer ${token}` }
                                                 });
                                                 alert('Your account has been permanently deleted.');

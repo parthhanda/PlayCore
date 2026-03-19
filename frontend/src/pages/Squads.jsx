@@ -19,7 +19,7 @@ const Squads = () => {
 
     const fetchSquads = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/squads');
+            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads`);
             setSquads(data);
         } catch (err) {
             console.error(err);
@@ -32,7 +32,7 @@ const Squads = () => {
         e.preventDefault();
         setError('');
         try {
-            const { data } = await axios.post('http://localhost:5000/api/squads', formData, {
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads`, formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setShowCreateModal(false);

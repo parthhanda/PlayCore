@@ -23,12 +23,12 @@ const PostDetail = () => {
 
     const fetchPostAndComments = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/posts/${slug}`);
+            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/posts/${slug}`);
             setPost(data);
             setLocalUpvotes(data.upvotes?.length || 0);
 
             // Fetch comments
-            const commentsRes = await axios.get(`http://localhost:5000/api/comments/${data._id}`);
+            const commentsRes = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/comments/${data._id}`);
             setComments(commentsRes.data);
         } catch (err) {
             setError('Intel report not found or classified.');
@@ -47,7 +47,7 @@ const PostDetail = () => {
     const handleUpvotePost = async () => {
         if (!user) return alert('Must be logged in to upvote');
         try {
-            const { data } = await axios.post(`http://localhost:5000/api/posts/${post._id}/upvote`, {}, {
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/posts/${post._id}/upvote`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setLocalUpvotes(data.length);
@@ -62,7 +62,7 @@ const PostDetail = () => {
         const reason = prompt('Reason for reporting this post:');
         if (!reason) return;
         try {
-            await axios.post(`http://localhost:5000/api/posts/${post._id}/report`, { reason }, {
+            await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/posts/${post._id}/report`, { reason }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert('Post reported to admins.');
@@ -76,7 +76,7 @@ const PostDetail = () => {
         if (!user || !newComment.trim()) return;
         setSubmittingComment(true);
         try {
-            const { data } = await axios.post(`http://localhost:5000/api/comments/${post._id}`, { content: newComment }, {
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/comments/${post._id}`, { content: newComment }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setComments([data, ...comments]);
@@ -92,7 +92,7 @@ const PostDetail = () => {
     const handleUpvoteComment = async (commentId) => {
         if (!user) return alert('Must be logged in to upvote');
         try {
-            const { data } = await axios.post(`http://localhost:5000/api/comments/item/${commentId}/upvote`, {}, {
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/comments/item/${commentId}/upvote`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setComments(comments.map(c => c._id === commentId ? { ...c, upvotes: data } : c));
@@ -106,7 +106,7 @@ const PostDetail = () => {
         const reason = prompt('Reason for reporting this comment:');
         if (!reason) return;
         try {
-            await axios.post(`http://localhost:5000/api/comments/item/${commentId}/report`, { reason }, {
+            await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/comments/item/${commentId}/report`, { reason }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert('Comment reported.');
@@ -118,7 +118,7 @@ const PostDetail = () => {
     const handleDeleteComment = async (commentId) => {
         if (!window.confirm('Delete this comment?')) return;
         try {
-            await axios.delete(`http://localhost:5000/api/comments/item/${commentId}`, {
+            await axios.delete(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/comments/item/${commentId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setComments(comments.filter(c => c._id !== commentId));
@@ -131,7 +131,7 @@ const PostDetail = () => {
         if (!window.confirm('WARNING: Are you sure you want to completely erase this intel record?')) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/posts/${post._id}`, {
+            await axios.delete(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/posts/${post._id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             navigate('/news');
@@ -185,7 +185,7 @@ const PostDetail = () => {
                         <div className="flex flex-wrap items-center gap-6 text-xs text-gray-400 font-bold uppercase tracking-widest bg-black/40 border border-white/5 p-4 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.5)]">
                             <Link to={`/u/${post.author.username}`} className="flex items-center gap-3 hover:text-primary transition-colors">
                                 <div className="w-8 h-8 rounded-full bg-gray-800 border border-white/10 overflow-hidden">
-                                    <img src={post.author.avatar ? `http://localhost:5000${post.author.avatar}` : 'https://api.dicebear.com/7.x/bottts/svg'} alt="Avatar" className="w-full h-full object-cover" />
+                                    <img src={post.author.avatar ? `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${post.author.avatar}` : 'https://api.dicebear.com/7.x/bottts/svg'} alt="Avatar" className="w-full h-full object-cover" />
                                 </div>
                                 <span>{post.author.username}</span>
                             </Link>
@@ -213,7 +213,7 @@ const PostDetail = () => {
                     {/* Cover Image */}
                     {post.coverImage && (
                         <div className="w-full h-64 md:h-[400px] lg:h-[500px] mb-12 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/10 relative">
-                            <img src={`http://localhost:5000${post.coverImage}`} alt={post.title} className="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
+                            <img src={`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${post.coverImage}`} alt={post.title} className="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 pointer-events-none"></div>
                         </div>
                     )}
@@ -272,7 +272,7 @@ const PostDetail = () => {
                                 <div key={comment._id} className="bg-black/40 border border-white/5 p-5 rounded-2xl flex gap-4 group hover:border-white/10 transition-colors">
                                     <Link to={`/u/${comment.author.username}`} className="flex-shrink-0">
                                         <div className="w-10 h-10 rounded-full bg-gray-800 border border-white/10 overflow-hidden">
-                                            <img src={comment.author.avatar ? `http://localhost:5000${comment.author.avatar}` : 'https://api.dicebear.com/7.x/bottts/svg'} alt="Avatar" className="w-full h-full object-cover" />
+                                            <img src={comment.author.avatar ? `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${comment.author.avatar}` : 'https://api.dicebear.com/7.x/bottts/svg'} alt="Avatar" className="w-full h-full object-cover" />
                                         </div>
                                     </Link>
                                     <div className="flex-1">

@@ -36,7 +36,7 @@ const TournamentDetail = () => {
                     return;
                 }
 
-                const { data } = await axios.get(`http://localhost:5000/api/tournaments/${id}`, {
+                const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
@@ -62,7 +62,7 @@ const TournamentDetail = () => {
         setEnrollLoading(true);
 
         try {
-            const { data } = await axios.post(`http://localhost:5000/api/tournaments/${id}/enroll`, enrollmentData, {
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/${id}/enroll`, enrollmentData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTournament(data); // Update with new enrollment
@@ -78,7 +78,7 @@ const TournamentDetail = () => {
     const handleExport = async () => {
         try {
             // We need to handle blob response for PDF
-            const response = await axios.get(`http://localhost:5000/api/tournaments/${id}/export`, {
+            const response = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/${id}/export`, {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob' // CRITICAL for PDF download
             });
@@ -274,7 +274,7 @@ const TournamentDetail = () => {
                                     <button
                                         onClick={async () => {
                                             try {
-                                                const res = await axios.put(`http://localhost:5000/api/tournaments/${id}/start`, {}, {
+                                                const res = await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/${id}/start`, {}, {
                                                     headers: { Authorization: `Bearer ${token}` }
                                                 });
                                                 setTournament(res.data.tournament);
@@ -313,7 +313,7 @@ const TournamentDetail = () => {
                                                 <button
                                                     onClick={async () => {
                                                         try {
-                                                            await axios.delete(`http://localhost:5000/api/tournaments/${id}`, {
+                                                            await axios.delete(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/${id}`, {
                                                                 headers: { Authorization: `Bearer ${token}` }
                                                             });
                                                             alert("OPERATION TERMINATED");
@@ -423,7 +423,7 @@ const TournamentDetail = () => {
                                     tournament.enrolledPlayers.map((player, idx) => (
                                         <div key={idx} className="flex items-center gap-3 p-2 bg-black/40 rounded-lg border border-white/5">
                                             <div className="w-8 h-8 rounded-full bg-gray-800 border border-white/10 overflow-hidden flex-shrink-0">
-                                                <img src={player.user.avatar ? `http://localhost:5000${player.user.avatar}` : 'https://via.placeholder.com/150'} alt="Avatar" className="w-full h-full object-cover" />
+                                                <img src={player.user.avatar ? `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${player.user.avatar}` : 'https://via.placeholder.com/150'} alt="Avatar" className="w-full h-full object-cover" />
                                             </div>
                                             <div className="flex-1 truncate">
                                                 <div className="text-xs font-bold text-white truncate">{player.user.username}</div>

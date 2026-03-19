@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     const checkUserLoggedIn = async () => {
         if (token) {
             try {
-                const { data } = await axios.get('http://localhost:5000/api/auth/me');
+                const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/me`);
                 setUser(data);
             } catch (err) {
                 console.error('Auth Check Failed:', err);
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/login`, { email, password });
             localStorage.setItem('token', data.token);
             setToken(data.token);
             setUser(data);
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/register', userData);
+            const { data } = await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/register`, userData);
             localStorage.setItem('token', data.token);
             setToken(data.token);
             setUser(data);
