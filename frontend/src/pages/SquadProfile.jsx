@@ -19,7 +19,7 @@ const SquadProfile = () => {
 
     const fetchSquad = async () => {
         try {
-            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads/${id}`);
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads/${id}`);
             setSquad(data);
         } catch (err) {
             setError('Squad not found');
@@ -34,7 +34,7 @@ const SquadProfile = () => {
 
         setActionLoading(true);
         try {
-            await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads/${id}/join`, {}, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads/${id}/join`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             window.location.reload();
@@ -50,7 +50,7 @@ const SquadProfile = () => {
 
         setActionLoading(true);
         try {
-            await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads/leave`, {}, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads/leave`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             navigate('/squads');
@@ -68,7 +68,7 @@ const SquadProfile = () => {
 
         setActionLoading(true);
         try {
-            await axios.delete(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/squads/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             navigate('/squads');
@@ -205,7 +205,7 @@ const SquadProfile = () => {
                             className="bg-black/20 border border-white/5 p-4 rounded-xl flex items-center gap-4 hover:bg-white/5 hover:border-secondary/30 transition-all group"
                         >
                             <img
-                                src={member.avatar ? `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${member.avatar}` : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'}
+                                src={member.avatar ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${member.avatar}` : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'}
                                 alt={member.username}
                                 className="w-12 h-12 rounded-lg object-cover bg-gray-900"
                             />

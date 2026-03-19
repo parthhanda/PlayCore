@@ -43,7 +43,7 @@ const ChatWidget = () => {
 
     const fetchFriends = async () => {
         try {
-            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/friends/list`);
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/friends/list`);
             setFriends(data);
         } catch (err) {
             console.error("Failed to fetch friends", err);

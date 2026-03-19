@@ -20,7 +20,7 @@ const Contact = () => {
         e.preventDefault();
         setStatus('loading');
         try {
-            await axios.post(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/contact`, formData);
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/contact`, formData);
             setStatus('success');
             setResponseMessage('TRANSMISSION SUCCESSFUL. OUR INTELLIGENCE TEAM WILL CONTACT YOU SOON.');
             setFormData({ name: '', email: '', subject: '', message: '' });

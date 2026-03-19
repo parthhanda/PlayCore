@@ -17,7 +17,7 @@ const AdminPanel = () => {
     const [broadcast, setBroadcast] = useState({ message: '', link: '' });
     const [sending, setSending] = useState(false);
 
-    const API = `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin`;
+    const API = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin`;
     const headers = { Authorization: `Bearer ${token}` };
 
     useEffect(() => {
@@ -334,7 +334,7 @@ const AdminPanel = () => {
                                     <div key={u._id} className="grid grid-cols-12 gap-4 p-4 border-b border-white/5 items-center hover:bg-white/5 transition-colors">
                                         <div className="col-span-1">
                                             <div className="w-8 h-8 rounded-full bg-gray-800 border border-white/10 overflow-hidden">
-                                                <img src={u.avatar ? `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${u.avatar}` : 'https://api.dicebear.com/7.x/bottts/svg'} alt="" className="w-full h-full object-cover" />
+                                                <img src={u.avatar ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${u.avatar}` : 'https://api.dicebear.com/7.x/bottts/svg'} alt="" className="w-full h-full object-cover" />
                                             </div>
                                         </div>
                                         <div className="col-span-3 font-bold text-sm truncate">{u.username}</div>

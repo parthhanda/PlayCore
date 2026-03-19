@@ -29,7 +29,7 @@ const Footer = () => {
             // For now, let's just toggle it if they are not subscribed, or leave it if they are.
             // Actually, let's check if the user is already subscribed.
             
-            await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/tournament-subscribe`, {}, {
+            await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/tournament-subscribe`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             

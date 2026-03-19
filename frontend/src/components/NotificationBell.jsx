@@ -49,7 +49,7 @@ const NotificationBell = () => {
 
     const fetchUnreadCount = async () => {
         try {
-            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/unread-count`, { headers });
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/unread-count`, { headers });
             setUnreadCount(data.count);
         } catch (err) {
             console.error(err);
@@ -59,7 +59,7 @@ const NotificationBell = () => {
     const fetchNotifications = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications?limit=15`, { headers });
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications?limit=15`, { headers });
             setNotifications(data.notifications);
         } catch (err) {
             console.error(err);
@@ -76,7 +76,7 @@ const NotificationBell = () => {
     const handleNotificationClick = async (notif) => {
         if (!notif.read) {
             try {
-                await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/${notif._id}/read`, {}, { headers });
+                await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/${notif._id}/read`, {}, { headers });
                 setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, read: true } : n));
                 setUnreadCount(prev => Math.max(0, prev - 1));
             } catch (err) { /* ignore */ }
@@ -87,7 +87,7 @@ const NotificationBell = () => {
 
     const markAllRead = async () => {
         try {
-            await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/read-all`, {}, { headers });
+            await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/read-all`, {}, { headers });
             setNotifications(prev => prev.map(n => ({ ...n, read: true })));
             setUnreadCount(0);
         } catch (err) { /* ignore */ }

@@ -19,7 +19,7 @@ const Tournaments = () => {
             try {
                 // Fetch public list (everyone can see this)
                 try {
-                    const publicRes = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/public`);
+                    const publicRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/public`);
                     setTournaments(publicRes.data);
                 } catch (err) {
                     console.error("Public tournaments fetch failed:", err);
@@ -30,7 +30,7 @@ const Tournaments = () => {
                     const headers = { Authorization: `Bearer ${token}` };
                     
                     try {
-                        const enrolledRes = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/enrolled`, { headers });
+                        const enrolledRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments/enrolled`, { headers });
                         setEnrolledTournaments(enrolledRes.data);
                     } catch (err) {
                         console.error("Enrolled tournaments fetch failed:", err);
@@ -38,7 +38,7 @@ const Tournaments = () => {
 
                     try {
                         // Get subscription status from user profile
-                        const userRes = await axios.get(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/profile`, { headers });
+                        const userRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/profile`, { headers });
                         setSubscribed(!!userRes.data.tournamentEmailSubscribed);
                     } catch (err) {
                         console.error("User profile fetch failed:", err);
@@ -58,7 +58,7 @@ const Tournaments = () => {
 
     const handleSubscribeToggle = async () => {
         try {
-            const { data } = await axios.put(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/tournament-subscribe`, {}, {
+            const { data } = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/tournament-subscribe`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSubscribed(data.subscribed);
