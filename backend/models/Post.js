@@ -52,7 +52,7 @@ const postSchema = new mongoose.Schema({
 });
 
 // Create index on slug for fast lookups
-postSchema.index({ slug: 1 });
+// postSchema.index({ slug: 1 }); // Removed: duplicate index warning since schema has unique: true
 postSchema.index({ createdAt: -1 }); // Index for feed sorting
 
 const Post = mongoose.model('Post', postSchema);

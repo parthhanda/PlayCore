@@ -10,6 +10,9 @@ const connectDB = require('./config/db');
 
 const app = express();
 
+// Trust reverse proxy (e.g. Render, Heroku) to ensure express-rate-limit works correctly
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
