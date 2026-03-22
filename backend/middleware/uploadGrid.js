@@ -5,7 +5,7 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 const storage = new GridFsStorage({
-    url: process.env.MONGO_URI,
+    url: process.env.MONGODB_URI,
     options: { useNewUrlParser: true, useUnifiedTopology: true },
     file: (req, file) => {
         return new Promise((resolve, reject) => {
