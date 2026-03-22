@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import DocumentTitleUpdater from './components/DocumentTitleUpdater';
 
 // Pages
 import Login from './pages/Login';
@@ -39,6 +40,7 @@ function App() {
         <SocketProvider>
           <div className="flex flex-col min-h-screen bg-background font-sans text-white">
             <Navbar />
+            <DocumentTitleUpdater />
 
             <main className="flex-grow">
               <Routes>

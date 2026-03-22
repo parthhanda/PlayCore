@@ -80,7 +80,7 @@ const createTournament = async (req, res) => {
                     sender: req.user.id
                 });
             }
-            console.log(`[TOURNAMENT] Emailed ${subscribers.length} subscribers about "${title}"`);
+
         } catch (emailErr) {
             console.error('[TOURNAMENT] Email notification error:', emailErr.message);
         }
@@ -300,26 +300,26 @@ const exportTournamentData = async (req, res) => {
 // @access  Private (Host Only)
 const deleteTournament = async (req, res) => {
     try {
-        console.log(`[DELETE OP] Attempting to terminate tournament ID: ${req.params.id} by user: ${req.user._id}`);
+
         const tournament = await Tournament.findById(req.params.id);
 
         if (!tournament) {
-            console.log(`[DELETE OP] Tournament not found`);
+
             return res.status(404).json({ message: 'Tournament not found' });
         }
         if (tournament.host.toString() !== req.user._id.toString()) {
-            console.log(`[DELETE OP] Not authorized. Host is ${tournament.host}, requesting user is ${req.user._id}`);
+
             return res.status(403).json({ message: 'Not authorized as host' });
         }
 
         // Terminate associated matches
         if (tournament.matches && tournament.matches.length > 0) {
             const matchDel = await Match.deleteMany({ _id: { $in: tournament.matches } });
-            console.log(`[DELETE OP] Deleted ${matchDel.deletedCount} associated matches`);
+
         }
 
         const delResult = await tournament.deleteOne();
-        console.log(`[DELETE OP] Successfully terminated tournament, result:`, delResult);
+
         res.status(200).json({ message: 'Tournament Terminated' });
     } catch (error) {
         console.error("TERMINATE ERROR:", error);

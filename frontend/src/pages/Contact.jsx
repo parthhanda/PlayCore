@@ -64,9 +64,9 @@ const Contact = () => {
                             </div>
                             <h3 className="text-lg font-bold font-display uppercase tracking-widest text-white mb-2">Central Node</h3>
                             <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                                Silicon Valley HQ<br />
-                                Palo Alto, CA 94301<br />
-                                United States
+                                Ludhiana<br />
+                                Punjab<br />
+                                India
                             </p>
                             <div className="h-px w-full bg-white/5"></div>
                         </div>

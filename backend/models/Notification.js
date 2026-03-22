@@ -18,7 +18,7 @@ const notificationSchema = new mongoose.Schema({
     link: { type: String, default: '' },
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     read: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now, expires: 2592000 } // 30-day TTL
+    createdAt: { type: Date, default: Date.now, expires: 604800 } // 7-day TTL
 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

@@ -24,7 +24,7 @@ const startTournamentReminders = () => {
             }).populate('enrolledPlayers.user', 'username email');
 
             for (const tournament of tournaments) {
-                console.log(`[REMINDER CRON] Sending reminders for: ${tournament.title}`);
+
 
                 const emailData = tournamentReminderEmail(tournament);
 
@@ -47,7 +47,7 @@ const startTournamentReminders = () => {
                 tournament.reminderSent = true;
                 await tournament.save();
 
-                console.log(`[REMINDER CRON] Sent ${tournament.enrolledPlayers.length} reminders for "${tournament.title}"`);
+
             }
         } catch (error) {
             console.error('[REMINDER CRON] Error:', error.message);

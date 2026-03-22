@@ -25,7 +25,7 @@ const initTransporter = async () => {
                 pass: process.env.SMTP_PASS
             }
         });
-        console.log(`[EMAIL] Using custom SMTP: ${process.env.SMTP_HOST} (Port: ${port}, Secure: ${secure})`);
+
     } else {
         // Dev: create Ethereal test account
         etherealAccount = await nodemailer.createTestAccount();
@@ -38,10 +38,7 @@ const initTransporter = async () => {
                 pass: etherealAccount.pass
             }
         });
-        console.log(`[EMAIL] Ethereal test account created:`);
-        console.log(`        User: ${etherealAccount.user}`);
-        console.log(`        Pass: ${etherealAccount.pass}`);
-        console.log(`        Preview emails at: https://ethereal.email/login`);
+
     }
 
     return transporter;
@@ -64,11 +61,11 @@ const sendEmail = async (to, subject, html) => {
         // If using Ethereal, log the preview URL
         if (etherealAccount) {
             const previewUrl = nodemailer.getTestMessageUrl(info);
-            console.log(`[EMAIL] Preview: ${previewUrl}`);
+
             return { messageId: info.messageId, previewUrl };
         }
 
-        console.log(`[EMAIL] Sent to ${to}: ${info.messageId}`);
+
         return { messageId: info.messageId };
     } catch (error) {
         console.error(`[EMAIL] Failed to send to ${to}:`, error.message);

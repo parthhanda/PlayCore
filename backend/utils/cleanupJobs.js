@@ -3,7 +3,7 @@ const Match = require('../models/Match');
 
 const runTournamentCleanup = async () => {
     try {
-        console.log('[Cleanup Job] Running routine tournament cleanup...');
+
         const now = new Date();
         const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
@@ -14,7 +14,7 @@ const runTournamentCleanup = async () => {
         );
 
         if (completedResult.modifiedCount > 0) {
-            console.log(`[Cleanup Job] Marked ${completedResult.modifiedCount} tournaments as completed.`);
+
         }
 
         // 2. Permanently delete tournaments 1 day after endDate
@@ -34,7 +34,7 @@ const runTournamentCleanup = async () => {
             }
 
             await Tournament.deleteMany({ _id: { $in: tournamentIds } });
-            console.log(`[Cleanup Job] Permanently deleted ${toDelete.length} expired tournaments and associated matches.`);
+
         }
     } catch (error) {
         console.error('[Cleanup Job] Error during tournament cleanup:', error);

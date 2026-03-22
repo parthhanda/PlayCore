@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { FaTrophy, FaGamepad, FaUsers, FaCalendarAlt, FaShieldAlt } from 'react-icons/fa';
+import { FaTrophy, FaGamepad, FaUsers, FaCalendarAlt, FaShieldAlt, FaClock } from 'react-icons/fa';
 
 const CreateTournament = () => {
     const { token } = useAuth();
@@ -16,7 +16,9 @@ const CreateTournament = () => {
         type: 'solo',
         maxParticipants: 16,
         startDate: '',
-        endDate: ''
+        startTime: '',
+        endDate: '',
+        endTime: ''
     });
 
     const [message, setMessage] = useState('');
@@ -30,13 +32,26 @@ const CreateTournament = () => {
         e.preventDefault();
         setMessage('');
 
-        if (new Date(formData.startDate) > new Date(formData.endDate)) {
+        if (!formData.startDate || !formData.startTime || !formData.endDate || !formData.endTime) {
+            return setMessage('PLEASE FILL IN ALL DATE AND TIME FIELDS');
+        }
+
+        const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
+        const endDateTime = new Date(`${formData.endDate}T${formData.endTime}`);
+
+        if (startDateTime > endDateTime) {
             return setMessage('END DATE CANNOT PRECEDE START DATE');
         }
 
+        const payload = {
+            ...formData,
+            startDate: startDateTime.toISOString(),
+            endDate: endDateTime.toISOString()
+        };
+
         try {
             setLoading(true);
-            const { data } = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments`, formData, {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/tournaments`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setLoading(false);
@@ -171,34 +186,71 @@ const CreateTournament = () => {
                             </div>
                         </div>
 
-                        {/* Schedule */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-primary font-mono text-xs tracking-widest uppercase mb-2">Start Time (Local)</label>
-                                <div className="relative">
-                                    <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary" />
-                                    <input
-                                        type="datetime-local"
-                                        name="startDate"
-                                        value={formData.startDate}
-                                        onChange={handleChange}
-                                        className="w-full bg-black/50 border border-white/10 rounded-xl px-12 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
-                                        required
-                                    />
+                        {/* Schedule Component */}
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-primary font-mono text-xs tracking-widest uppercase mb-2">Start Date</label>
+                                    <div className="relative">
+                                        <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary" />
+                                        <input
+                                            type="date"
+                                            name="startDate"
+                                            value={formData.startDate}
+                                            onChange={handleChange}
+                                            style={{ colorScheme: 'dark' }}
+                                            className="w-full bg-black/50 border border-white/10 rounded-xl px-12 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-primary font-mono text-xs tracking-widest uppercase mb-2">Start Time</label>
+                                    <div className="relative">
+                                        <FaClock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary" />
+                                        <input
+                                            type="time"
+                                            name="startTime"
+                                            value={formData.startTime}
+                                            onChange={handleChange}
+                                            style={{ colorScheme: 'dark' }}
+                                            className="w-full bg-black/50 border border-white/10 rounded-xl px-12 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-primary font-mono text-xs tracking-widest uppercase mb-2">Estimated End Time</label>
-                                <div className="relative">
-                                    <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                                    <input
-                                        type="datetime-local"
-                                        name="endDate"
-                                        value={formData.endDate}
-                                        onChange={handleChange}
-                                        className="w-full bg-black/50 border border-white/10 rounded-xl px-12 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
-                                        required
-                                    />
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-gray-400 font-mono text-xs tracking-widest uppercase mb-2">End Date</label>
+                                    <div className="relative">
+                                        <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                                        <input
+                                            type="date"
+                                            name="endDate"
+                                            value={formData.endDate}
+                                            onChange={handleChange}
+                                            style={{ colorScheme: 'dark' }}
+                                            className="w-full bg-black/50 border border-white/10 rounded-xl px-12 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-gray-400 font-mono text-xs tracking-widest uppercase mb-2">End Time</label>
+                                    <div className="relative">
+                                        <FaClock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                                        <input
+                                            type="time"
+                                            name="endTime"
+                                            value={formData.endTime}
+                                            onChange={handleChange}
+                                            style={{ colorScheme: 'dark' }}
+                                            className="w-full bg-black/50 border border-white/10 rounded-xl px-12 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

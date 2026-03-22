@@ -15,19 +15,19 @@ const initSocket = (server) => {
     const onlineUsers = new Map(); // userId -> socketId
 
     io.on('connection', (socket) => {
-        console.log('New client connected:', socket.id);
+
 
         const userId = socket.handshake.query.userId;
         if (userId) {
             onlineUsers.set(userId, socket.id);
             socket.join(`user_${userId}`); // Join user-specific room for targeted notifications
             io.emit('online_users', Array.from(onlineUsers.keys()));
-            console.log(`User ${userId} came online.`);
+
         }
 
         socket.on('join_room', (room) => {
             socket.join(room);
-            console.log(`Socket ${socket.id} joined room ${room} `);
+
         });
 
         socket.on('send_message', (data) => {
@@ -37,7 +37,7 @@ const initSocket = (server) => {
 
         socket.on('join_private_chat', async ({ roomId }) => {
             socket.join(roomId);
-            console.log(`Socket ${socket.id} joined private room ${roomId} `);
+
 
             // Fetch chat history
             try {
@@ -105,7 +105,7 @@ const initSocket = (server) => {
         });
 
         socket.on('disconnect', () => {
-            console.log('Client disconnected:', socket.id);
+
             if (userId) {
                 onlineUsers.delete(userId);
                 io.emit('online_users', Array.from(onlineUsers.keys()));

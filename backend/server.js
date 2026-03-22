@@ -16,13 +16,16 @@ app.use(helmet({
 }));
 
 // CORS Lockdown
-const allowedOrigins = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : ['http://localhost:5173'];
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174'] 
+  : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174'];
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS: ' + origin));
     }
   },
   credentials: true
@@ -76,7 +79,7 @@ app.use('/api/contact', require('./routes/contactRoutes'));
 // Initialize email service and tournament reminder cron
 const { initTransporter } = require('./utils/emailService');
 const { startTournamentReminders } = require('./utils/tournamentReminder');
-initTransporter().then(() => console.log('[EMAIL] Transporter ready'));
+initTransporter().catch(err => console.error(err));
 startTournamentReminders();
 
 // Serve static assets

@@ -34,7 +34,8 @@ const TournamentSchema = new mongoose.Schema({
     },
     endDate: {
         type: Date,
-        index: true
+        index: true,
+        expires: 172800 // 48-hour (2 days) TTL after endDate
     },
     status: {
         type: String,
