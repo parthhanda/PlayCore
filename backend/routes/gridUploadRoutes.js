@@ -14,8 +14,8 @@ router.post('/gridfs', protect, (req, res) => {
         if (req.file) {
             // Return statis URL format that our frontend can use to fetch the image directly
             return res.status(201).json({
-                message: 'Image uploaded successfully to local storage',
-                image: `/uploads/${req.file.filename}`,
+                message: 'Image uploaded successfully to GridFS',
+                image: `/api/upload/image/${req.file.filename}`,
                 size: req.file.size
             });
         }
