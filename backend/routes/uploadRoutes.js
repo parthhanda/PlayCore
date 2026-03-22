@@ -3,14 +3,41 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const upload = require('../middleware/uploadMiddleware');
 
+const path = require('path');
+const crypto = require('crypto');
+
 router.post('/', upload.single('image'), (req, res) => {
-    if (req.file) {
-        res.json({
-            message: 'Image uploaded successfully to GridFS',
-            image: `/api/upload/image/${req.file.filename}`,
+    if (!req.file) {
+        return res.status(400).send('No file uploaded');
+    }
+
+    try {
+        const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+            bucketName: 'uploads'
         });
-    } else {
-        res.status(400).send('No file uploaded');
+
+        const uniqueFilename = `${req.file.fieldname}-${Date.now()}${path.extname(req.file.originalname)}`;
+        
+        const uploadStream = bucket.openUploadStream(uniqueFilename, {
+            contentType: req.file.mimetype
+        });
+
+        uploadStream.end(req.file.buffer);
+
+        uploadStream.on('finish', () => {
+            res.status(201).json({
+                message: 'Image uploaded successfully to GridFS',
+                image: `/api/upload/image/${uniqueFilename}`
+            });
+        });
+
+        uploadStream.on('error', (err) => {
+            console.error('GridFS Upload Error:', err);
+            res.status(500).json({ error: 'Error uploading file' });
+        });
+    } catch (err) {
+        console.error('Upload route error:', err);
+        res.status(500).json({ error: 'Server error during upload' });
     }
 });
 

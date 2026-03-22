@@ -1,23 +1,8 @@
 const multer = require('multer');
-const { GridFsStorage } = require('multer-gridfs-storage');
 const path = require('path');
-
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
-const storage = new GridFsStorage({
-    url: process.env.MONGODB_URI,
-    options: { useNewUrlParser: true, useUnifiedTopology: true },
-    file: (req, file) => {
-        return new Promise((resolve, reject) => {
-            const filename = `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
-            const fileInfo = {
-                filename: filename,
-                bucketName: 'uploads'
-            };
-            resolve(fileInfo);
-        });
-    }
-});
+const storage = multer.memoryStorage();
 
 // Check file type helper
 function checkFileType(file, cb) {

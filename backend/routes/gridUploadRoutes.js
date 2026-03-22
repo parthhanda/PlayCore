@@ -11,17 +11,40 @@ router.post('/gridfs', protect, (req, res) => {
             return res.status(500).json({ message: 'Multer Error', error: err.message || err });
         }
         
-        if (req.file) {
-            // Return statis URL format that our frontend can use to fetch the image directly
-            return res.status(201).json({
-                message: 'Image uploaded successfully to GridFS',
-                image: `/api/upload/image/${req.file.filename}`,
-                size: req.file.size
-            });
+        if (!req.file) {
+            console.error('No file processed by multer');
+            return res.status(400).send('No file uploaded or file rejected (10MB limit / valid formats only)');
         }
-        
-        console.error('No file processed by multer');
-        return res.status(400).send('No file uploaded or file rejected (10MB limit / valid formats only)');
+
+        try {
+            const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+                bucketName: 'uploads'
+            });
+
+            const uniqueFilename = `${req.file.fieldname}-${Date.now()}-${req.file.originalname}`;
+            
+            const uploadStream = bucket.openUploadStream(uniqueFilename, {
+                contentType: req.file.mimetype
+            });
+
+            uploadStream.end(req.file.buffer);
+
+            uploadStream.on('finish', () => {
+                return res.status(201).json({
+                    message: 'Image uploaded successfully to GridFS',
+                    image: `/api/upload/image/${uniqueFilename}`,
+                    size: req.file.size
+                });
+            });
+
+            uploadStream.on('error', (uploadErr) => {
+                console.error('GridFS Upload Error:', uploadErr);
+                return res.status(500).json({ message: 'Error saving to GridFS', error: uploadErr.message });
+            });
+        } catch (dbErr) {
+            console.error('GridFS connection error:', dbErr);
+            return res.status(500).json({ message: 'Database error', error: dbErr.message });
+        }
     });
 });
 
